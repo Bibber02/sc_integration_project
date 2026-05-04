@@ -9,8 +9,8 @@ daoutgain = 1*[-6];                   % output gain
 a_theta_1 = 1.200374077783257;
 b_theta_1 = 1.070535559513546;
 
-a_theta_2 = -1.222725978474668;
-b_theta_2 = 3.759434999826716;
+a_theta_2 = 1.222725978474668;
+b_theta_2 = 1.190099998448171;
 
 % Sensor calibration:
 adinoffs = -[b_theta_1 b_theta_2];
