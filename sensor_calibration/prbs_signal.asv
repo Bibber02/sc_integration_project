@@ -1,0 +1,17 @@
+h = 0.01;
+Tsim = 30;
+N = Tsim / h;
+
+freqs = logspace(-1, 2, 30);
+omega = freqs;
+u_multi = zeros(length(t), 1);
+for k = 1:length(freqs);
+    
+
+
+
+u_prbs = idinput(N, 'prbs', [0, 0.08], [-1, 1]);
+
+
+t = (0:h:Tsim-h)';
+simin = [t, u_prbs];
