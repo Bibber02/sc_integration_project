@@ -9,7 +9,8 @@ theta2 = theta_2_Chrip_Amp0_5;
 % subplot(3,1,3); plot(theta2');      ylabel('\theta 2');
 % xlabel('Time [s]')
 
-N = length(u);
+N = length(u.Time);
+h = max(u.Time) / N;
 fs = 1/h;
 
 U = fft(u.Data) / N;
@@ -17,17 +18,19 @@ Y = fft(theta2.Data) / N;
 
 f = (0:N-1)' * (fs/N);
 idx = 1:floor(N/2);
+
 f_plot = f(idx);
-G_hat = Y(idx) / U(idx);
+G_hat = Y(idx) ./ U(idx);
+f_plot
 
 figure;
 subplot(2,1,1);
-semilogx(f_plot, 20*log10(abs(U)));
+semilogx(20*log10(abs(U)));
 ylabel('Magnitude [dB]');
 grid on;
 
-subplot(2, 1, 1);
-semilogx(f_plot, angle(G_hat) * 180/pi);
+subplot(2, 1, 2);
+semilogx(angle(G_hat) * 180/pi);
 ylabel('Phase [deg]')
 xlabel('Frequency [Hz]')
 grid on;
