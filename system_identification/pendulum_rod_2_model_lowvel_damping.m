@@ -9,21 +9,6 @@ function [dx, y] = pendulum_rod_2_model_lowvel_damping( ...
 %       -[p_b2 + p_b_low*exp(-(theta_dot/v_b)^2)]*theta_dot
 %       -p_c2*tanh(theta_dot/eps_v)
 %       -p_g2*sin(theta)
-%
-% States:
-%   x(1) = theta      [rad]
-%   x(2) = theta_dot  [rad/s]
-%
-% Parameters:
-%   p_b2     = baseline viscous damping             [1/s]
-%   p_g2     = gravity parameter                    [1/s^2]
-%   p_c2     = Coulomb friction strength            [rad/s^2]
-%   p_b_low  = additional low-velocity damping      [1/s]
-%   v_b      = low-velocity damping scale           [rad/s]
-%   eps_v    = Coulomb smoothing velocity           [rad/s]
-%
-% Input:
-%   u is included for idnlgrey compatibility, but is not used.
 
 theta     = x(1);
 theta_dot = x(2);
