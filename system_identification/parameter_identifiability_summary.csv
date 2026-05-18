@@ -1,0 +1,4 @@
+Model,NumParameters,NumFreeParameters,MaxRelativeStdPercent,MaxAbsFreeParameterCorrelation,FreeCovarianceConditionNumber
+Viscous,2,2,0.869786700704596,0.914140405143134,101536.937242941
+Coulomb-viscous,4,3,11.8894648052778,0.934943428458711,130043.672887778
+Best Stribeck fixed-vs grid,6,1,49.4066643470164,NaN,NaN
