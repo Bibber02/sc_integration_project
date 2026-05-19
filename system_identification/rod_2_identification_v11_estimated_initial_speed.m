@@ -2,7 +2,7 @@ clear;          % Removes all variables from the workspace
 clear functions;  % Clears cached local/helper functions so MATLAB cannot use an older version
 clc;            % Clears the Command Window
 close all;      % Closes all figure windows
-fprintf('Running rod_2_identification_v10_stribeck_grid_extended.m\n');
+fprintf('Running rod_2_identification_v11_estimated_initial_speed.m\n');
 
 %% Load data
 raw_data = load("identification_data\rod_2_identification\matlab.mat");
@@ -173,6 +173,9 @@ end
 %   1) Viscous + gravity model on full selected data
 %   2) Coulomb-viscous model on full selected data
 %   3) Grid search over fixed Stribeck velocities; only p_sdelta is estimated
+%
+% In all stages theta_dot(0) is estimated as an initial condition to reduce
+% phase/lead-lag errors from imperfect manual truncation.
 % ================================================================
 
 %% Settings
@@ -199,7 +202,7 @@ nStartsCoulomb = 1;
 % grid is extended further upward. If the selected value still lands at the
 % largest candidate, the result should be treated as boundary-limited and the
 % grid can be extended again.
-stribeckVsCandidates = [2.50 2.55 2.60 2.65 2.70 2.75 2.80 2.85 2.90 2.95 3.00 3.05 3.10 3.15 3.2 3.25];
+stribeckVsCandidates = [2.50 2.75 3 3.25 3.50];
 
 % Only p_sdelta is free for a fixed v_s, so repeated random starts give almost
 % identical results. One start per candidate is enough and much faster.
@@ -209,6 +212,24 @@ nStartsStribeckPerVs = 1;
 % to avoid choosing a tail-only solution that stops the full oscillation too early.
 stribeckSelection.tailValidationWeight = 0.30;
 stribeckSelection.fullValidationWeight = 0.70;
+
+% Initial angular velocity handling.
+% The truncation indices are close to peaks, but not necessarily exactly at
+% zero angular velocity. If theta_dot(0) is forced to zero while the data
+% starts slightly before/after a peak, the model can appear to lead or lag the
+% measurement even when the friction model is good. Therefore theta(0) is kept
+% fixed to the measured first sample, while theta_dot(0) is estimated as a
+% nuisance initial condition during nlgreyest. The initial guess for theta_dot(0)
+% is obtained from a short linear fit to the first samples of each segment.
+initialStateSettings.estimateInitialSpeed = true;
+initialStateSettings.velocityFitSamples = 9;
+initialStateSettings.maxAbsInitialSpeed = 5.0;  % rad/s, only used for the initial guess clamp
+
+% During compare/plotting, estimate the initial condition again. This makes the
+% validation plots test the model dynamics without penalising a small manually
+% selected start-index timing error. If this is not available in your MATLAB
+% version, the helper automatically falls back to normal compare(...).
+useEstimatedInitialConditionForCompare = true; %#ok<NASGU>
 
 % The model files are written automatically so this script is self-contained.
 overwritePassiveModelFiles = true;
@@ -300,9 +321,9 @@ disp(uncertaintyVisc);
 
 mVisc_val = setPassiveInitialStates(mVisc, expData, idxVal, 'id');
 
-[~, fitViscEst] = compare(zEst, mVisc);
-[~, fitViscVal] = compare(zVal, mVisc_val);
-[~, fitViscAll] = compare(zAll, setPassiveInitialStates(mVisc, expData, idxAll, 'id'));
+[~, fitViscEst] = comparePassiveModel(zEst, mVisc);
+[~, fitViscVal] = comparePassiveModel(zVal, mVisc_val);
+[~, fitViscAll] = comparePassiveModel(zAll, setPassiveInitialStates(mVisc, expData, idxAll, 'id'));
 
 fprintf("\nViscous model mean estimation fit: %.2f %%\n", meanFitValue(fitViscEst));
 fprintf("Viscous model mean validation fit: %.2f %%\n", meanFitValue(fitViscVal));
@@ -361,9 +382,9 @@ if runCoulombMultistart
             mCoulTry_val = setPassiveInitialStates(mCoulTry, expData, idxVal, 'id');
             mCoulTry_all = setPassiveInitialStates(mCoulTry, expData, idxAll, 'id');
 
-            [~, fitCoulTryEst] = compare(zEst, mCoulTry);
-            [~, fitCoulTryVal] = compare(zVal, mCoulTry_val);
-            [~, fitCoulTryAll] = compare(zAll, mCoulTry_all);
+            [~, fitCoulTryEst] = comparePassiveModel(zEst, mCoulTry);
+            [~, fitCoulTryVal] = comparePassiveModel(zVal, mCoulTry_val);
+            [~, fitCoulTryAll] = comparePassiveModel(zAll, mCoulTry_all);
 
             meanCoulTryEst = meanFitValue(fitCoulTryEst);
             meanCoulTryVal = meanFitValue(fitCoulTryVal);
@@ -406,9 +427,9 @@ disp(uncertaintyCoul);
 
 mCoul_val = setPassiveInitialStates(mCoul, expData, idxVal, 'id');
 
-[~, fitCoulEst] = compare(zEst, mCoul);
-[~, fitCoulVal] = compare(zVal, mCoul_val);
-[~, fitCoulAll] = compare(zAll, setPassiveInitialStates(mCoul, expData, idxAll, 'id'));
+[~, fitCoulEst] = comparePassiveModel(zEst, mCoul);
+[~, fitCoulVal] = comparePassiveModel(zVal, mCoul_val);
+[~, fitCoulAll] = comparePassiveModel(zAll, setPassiveInitialStates(mCoul, expData, idxAll, 'id'));
 
 fprintf("\nCoulomb model mean estimation fit: %.2f %%\n", meanFitValue(fitCoulEst));
 fprintf("Coulomb model mean validation fit: %.2f %%\n", meanFitValue(fitCoulVal));
@@ -479,10 +500,10 @@ for iVs = 1:numel(stribeckVsCandidates)
             mTry_full_val = setPassiveInitialStates(mTry, expData, idxVal, 'id');
             mTry_all_full = setPassiveInitialStates(mTry, expData, idxAll, 'id');
 
-            [~, fitTailEst] = compare(zTailEst, mTry);
-            [~, fitTailVal] = compare(zTailVal, mTry_tail_val);
-            [~, fitFullVal] = compare(zVal, mTry_full_val);
-            [~, fitFullAll] = compare(zAll, mTry_all_full);
+            [~, fitTailEst] = comparePassiveModel(zTailEst, mTry);
+            [~, fitTailVal] = comparePassiveModel(zTailVal, mTry_tail_val);
+            [~, fitFullVal] = comparePassiveModel(zVal, mTry_full_val);
+            [~, fitFullAll] = comparePassiveModel(zAll, mTry_all_full);
 
             meanTailEstFit = meanFitValue(fitTailEst);
             meanTailValFit = meanFitValue(fitTailVal);
@@ -546,9 +567,9 @@ mStrBest_tail_val = setPassiveInitialStates(mStrBest, expData, idxVal, 'tail');
 mStrBest_full_val = setPassiveInitialStates(mStrBest, expData, idxVal, 'id');
 mStrBest_full_all = setPassiveInitialStates(mStrBest, expData, idxAll, 'id');
 
-[~, fitStrBestTailVal] = compare(zTailVal, mStrBest_tail_val);
-[~, fitStrBestFullVal] = compare(zVal, mStrBest_full_val);
-[~, fitStrBestFullAll] = compare(zAll, mStrBest_full_all);
+[~, fitStrBestTailVal] = comparePassiveModel(zTailVal, mStrBest_tail_val);
+[~, fitStrBestFullVal] = comparePassiveModel(zVal, mStrBest_full_val);
+[~, fitStrBestFullAll] = comparePassiveModel(zAll, mStrBest_full_all);
 
 fprintf("\nBest report/Stribeck model mean tail validation fit: %.2f %%\n", meanFitValue(fitStrBestTailVal));
 fprintf("Best report/Stribeck model mean full validation fit: %.2f %%\n", meanFitValue(fitStrBestFullVal));
@@ -943,6 +964,11 @@ end
 
 function X0 = passiveInitialStateCell(expData, idx, segment)
 %PASSIVEINITIALSTATECELL Create initial states for multi-experiment idnlgrey.
+%
+% theta(0) is fixed to the measured first sample. theta_dot(0) is initialised
+% from the first few samples of the selected segment and then estimated as a
+% nuisance initial condition by nlgreyest. This avoids forcing the experiment
+% to start exactly at a turning point.
 
 nExp = length(idx);
 
@@ -962,10 +988,51 @@ for k = 1:nExp
             error("Unknown segment '%s'. Use 'id' or 'tail'.", segment);
     end
 
-    thetaDot0(k) = 0;
+    thetaDot0(k) = estimateInitialAngularVelocity(expData, i, segment);
 end
 
 X0 = {theta0; thetaDot0};
+
+end
+
+function thetaDot0 = estimateInitialAngularVelocity(expData, i, segment)
+%ESTIMATEINITIALANGULARVELOCITY Estimate an initial angular velocity guess.
+%
+% The estimate is only an initial guess. Since theta_dot(0) is free during
+% nlgreyest, the optimiser can adjust it. A short linear fit is less noisy than
+% a single finite difference.
+
+switch segment
+    case 'id'
+        t = double(expData(i).t_id(:));
+        y = double(expData(i).y_id(:));
+    case 'tail'
+        t = double(expData(i).t_tail(:));
+        y = double(expData(i).y_tail(:));
+    otherwise
+        error("Unknown segment '%s'. Use 'id' or 'tail'.", segment);
+end
+
+if numel(t) < 2 || numel(y) < 2
+    thetaDot0 = 0;
+    return;
+end
+
+nFit = min(9, numel(t));
+tFit = t(1:nFit) - t(1);
+yFit = y(1:nFit);
+
+if all(abs(tFit) < eps)
+    thetaDot0 = 0;
+else
+    p = polyfit(tFit, yFit, 1);
+    thetaDot0 = p(1);
+end
+
+% Clamp only the starting guess to avoid extreme values caused by noisy or very
+% short windows. The parameter itself is still estimated freely by nlgreyest.
+maxAbsInitialSpeed = 5.0;
+thetaDot0 = max(-maxAbsInitialSpeed, min(maxAbsInitialSpeed, thetaDot0));
 
 end
 
@@ -1024,10 +1091,14 @@ mOut.Name = mIn.Name;
 end
 
 function m = fixPassiveInitialStates(m)
-%FIXPASSIVEINITIALSTATES Fix initial states during parameter estimation.
+%FIXPASSIVEINITIALSTATES Configure initial states during parameter estimation.
+%
+% Keep theta(0) fixed to the measured first sample, but estimate theta_dot(0).
+% A small nonzero theta_dot(0) mainly corrects phase/lead-lag errors caused by
+% cutting the data slightly before or after a true peak.
 
 fixedTheta = true(size(m.InitialStates(1).Value));
-fixedThetaDot = true(size(m.InitialStates(2).Value));
+fixedThetaDot = false(size(m.InitialStates(2).Value));
 
 m = setinit(m, 'Fixed', {fixedTheta; fixedThetaDot});
 
@@ -1337,6 +1408,29 @@ end
 
 end
 
+function [yHatData, fit] = comparePassiveModel(data, model)
+%COMPAREPASSIVEMODEL Compare using estimated initial conditions when available.
+%
+% This is useful for validation and plotting because the manually selected
+% start index can be slightly before/after a peak. If compareOptions with
+% InitialCondition='estimate' is unavailable in the MATLAB version, fall back
+% to the standard compare call.
+
+try
+    optCompare = compareOptions;
+    optCompare.InitialCondition = 'estimate';
+    [yHatData, fit] = compare(data, model, optCompare);
+catch
+    try
+        optCompare = compareOptions('InitialCondition', 'estimate');
+        [yHatData, fit] = compare(data, model, optCompare);
+    catch
+        [yHatData, fit] = compare(data, model);
+    end
+end
+
+end
+
 function m = meanFitValue(fit)
 %MEANFITVALUE Convert compare(...) fit output to scalar mean.
 
@@ -1381,7 +1475,7 @@ for i = 1:length(angles)
     mSingle = setPassiveInitialStates(model, expData, i, segment);
 
     try
-        [yHatData, fit] = compare(zCell{i}, mSingle);
+        [yHatData, fit] = comparePassiveModel(zCell{i}, mSingle);
         yModel = iddataOutputVector(yHatData);
         fitValue = meanFitValue(fit);
     catch ME
