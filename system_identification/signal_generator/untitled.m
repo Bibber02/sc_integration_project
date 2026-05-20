@@ -2,8 +2,8 @@ Ts        = 0.001;     % sample time [s]
 Tsim      = 120;       % total duration [s]
 N         = Tsim/Ts + 1;
 
-amplitude = 0.15;     % signal switches between -0.15 and +0.15
-clockSamples = 25;    % hold each PRBS value for 25 samples = 0.25 s
+amplitude = 0.125;     % signal switches between -0.15 and +0.15
+clockSamples = 100;    % hold each PRBS value for 25 samples = 0.25 s
 
 Range = [-amplitude amplitude];
 Band  = [0 1/clockSamples];
