@@ -1,114 +1,70 @@
-function [u_cmd, safety_mode, theta1_dot_est] = motor_bias_feedback_controller(theta1_meas, theta1_ref, u_probe, reset)
-%MOTOR_BIAS_FEEDBACK_CONTROLLER Conservative feedback controller for motor bias tests.
+function [u_cmd, safety_mode] = motor_bias_simple_feedback(theta1, u_probe)
+% Simple closed-loop safety controller for motor bias/deadzone testing.
 %
-% Use this code in a Simulink MATLAB Function block.
+% The controller keeps theta_1 close to theta_1 = pi.
+% Safety limits are based on the deviation from pi.
 %
 % Inputs:
-%   theta1_meas : measured theta_1 [rad]
-%   theta1_ref  : reference theta_1 [rad], from theta1_ref_bias_id
-%   u_probe     : small probe command, from u_probe_bias_id
-%   reset       : boolean reset signal; use false/0 if not needed
+%   theta1  = measured rod-1 angle [rad]
+%   u_probe = small probe signal from From Workspace
 %
 % Outputs:
-%   u_cmd          : motor command
-%   safety_mode    : 0 normal, 1 soft-limit recovery, 2 hard-limit recovery
-%   theta1_dot_est : filtered velocity estimate [rad/s]
-%
-% Tune the constants below on the real setup.
+%   u_cmd       = actual command sent to motor
+%   safety_mode = 0 normal, 1 soft recovery, 2 hard recovery
 
-%#codegen
-
-%% ================================================================
-% Tunable constants
-% ================================================================
-
-Ts = 0.01;                 % controller sample time [s]
-
-% If positive controller action moves theta_1 the wrong way, set motorSign = -1.
-motorSign = 1;
-
-% Conservative PD gains. Start low and increase only if the system feels sluggish.
+% ---------- tunable constants ----------
 Kp = 0.45;
-Kd = 0.08;
 
-% Stronger gains used near the soft/hard angle limits.
-KpSafety = 0.80;
-KdSafety = 0.12;
+theta_ref = pi;              % stable hanging equilibrium [rad]
 
-% Command limits. Keep conservative for the first tests.
-uMaxNormal = 0.18;
-uMaxSafety = 0.25;
+maxCommand = 0.15;           % saturation of actual motor command
 
-% Angle safety limits.
-thetaSoftLimit = 70*pi/180;
-thetaHardLimit = 80*pi/180;
+softLimit = 70*pi/180;       % soft recovery starts at +/-70 deg from pi
+hardLimit = 80*pi/180;       % hard recovery starts at +/-80 deg from pi
 
-% In safety mode, drive back toward this safe centre.
-thetaRecoveryRef = 0.0;
+motorSign = 1;               % change to -1 if feedback pushes the wrong way
 
-% Low-pass filter for derivative estimate.
-% Smaller alpha = smoother but more delayed.
-alphaVel = 0.15;
+% ---------- angle error ----------
+% Use this if theta_1 is continuous around pi:
+theta_error = theta_ref - theta1;
 
-%% ================================================================
-% Persistent derivative estimate
-% ================================================================
+% Use this instead if theta_1 wraps between -pi and pi:
+% theta_error = atan2(sin(theta_ref - theta1), cos(theta_ref - theta1));
 
-persistent thetaPrev thetaDotFilt initialized
+absThetaError = abs(theta_error);
 
-if isempty(initialized) || reset ~= 0
-    thetaPrev = theta1_meas;
-    thetaDotFilt = 0.0;
-    initialized = true;
-end
+% ---------- safety logic ----------
+if absThetaError >= hardLimit
 
-rawDot = (theta1_meas - thetaPrev) / Ts;
-thetaDotFilt = (1 - alphaVel) * thetaDotFilt + alphaVel * rawDot;
-thetaPrev = theta1_meas;
-
-theta1_dot_est = thetaDotFilt;
-
-%% ================================================================
-% Normal feedback law
-% ================================================================
-
-e = theta1_ref - theta1_meas;
-u_fb = Kp * e - Kd * thetaDotFilt;
-
-u_unsat = u_fb + u_probe;
-u_limit = uMaxNormal;
-safety_mode = 0;
-
-%% ================================================================
-% Safety override
-% ================================================================
-
-absTheta = abs(theta1_meas);
-
-if absTheta >= thetaSoftLimit
-    % Ignore probe and drive back to centre.
-    eSafety = thetaRecoveryRef - theta1_meas;
-    u_unsat = KpSafety * eSafety - KdSafety * thetaDotFilt;
-    u_limit = uMaxSafety;
-    safety_mode = 1;
-end
-
-if absTheta >= thetaHardLimit
-    % Strong recovery. You can also connect safety_mode == 2 to a Stop block.
-    eSafety = thetaRecoveryRef - theta1_meas;
-    u_unsat = 1.25 * KpSafety * eSafety - 1.25 * KdSafety * thetaDotFilt;
-    u_limit = uMaxSafety;
     safety_mode = 2;
+
+    % Hard recovery: ignore probe and drive toward theta_1 = pi
+    u_feedback = Kp * theta_error;
+    u_cmd_raw = motorSign * u_feedback;
+
+elseif absThetaError >= softLimit
+
+    safety_mode = 1;
+
+    % Soft recovery: ignore probe and drive toward theta_1 = pi
+    u_feedback = Kp * theta_error;
+    u_cmd_raw = motorSign * u_feedback;
+
+else
+
+    safety_mode = 0;
+
+    % Normal test mode: feedback plus small probe signal
+    u_feedback = Kp * theta_error;
+    u_cmd_raw = motorSign * (u_feedback + u_probe);
+
 end
 
-%% ================================================================
-% Final saturation and sign convention
-% ================================================================
-
-u_cmd = motorSign * saturate(u_unsat, -u_limit, u_limit);
-
-end
-
-function y = saturate(x, xmin, xmax)
-    y = min(max(x, xmin), xmax);
+% ---------- saturation ----------
+if u_cmd_raw > maxCommand
+    u_cmd = maxCommand;
+elseif u_cmd_raw < -maxCommand
+    u_cmd = -maxCommand;
+else
+    u_cmd = u_cmd_raw;
 end

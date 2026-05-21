@@ -1,21 +1,17 @@
 %% generate_closed_loop_motor_bias_id_signals.m
-% Closed-loop motor bias / deadzone identification signals.
+% Generates closed-loop motor bias / deadzone identification signals.
 %
-% Use these signals in Simulink:
-%   theta1_ref_bias_id  -> reference input for a feedback controller
-%   u_probe_bias_id     -> small probe command added inside the controller
+% Use in Simulink:
+%   From Workspace block 1: u_probe_bias_id
+%   From Workspace block 2: theta1_ref_bias_id
 %
-% DO NOT feed u_probe_bias_id directly to the motor without feedback.
+% The actual motor command should be computed in a MATLAB Function block
+% using theta_1 feedback and u_probe_bias_id.
 %
-% Recommended Simulink structure:
+% theta_1 equilibrium is assumed to be pi radians.
+% Safety range is defined around theta_1 = pi:
 %
-%   From Workspace: theta1_ref_bias_id ----\
-%                                      MATLAB Function controller ---> motor command
-%   From Workspace: u_probe_bias_id --------/
-%   measured theta_1 ----------------------/
-%
-% The MATLAB Function controller should implement saturation and angle safety.
-% See motor_bias_feedback_controller.m.
+%   theta_1 must stay close to pi +/- 80 degrees.
 
 clear;
 clc;
@@ -27,204 +23,247 @@ close all;
 
 Ts = 0.01;                         % sample time [s]
 
-% Safe theta_1 range. The reference trajectory stays well inside this range.
-thetaSoftLimitDeg = 70;            % controller enters recovery mode near this
-thetaHardLimitDeg = 80;            % emergency limit / stop condition
+% Stable hanging equilibrium of theta_1
+theta1_equilibrium = pi;           % [rad]
 
-% Reference schedule for theta_1 in degrees, relative to your chosen safe centre.
-% Keep this conservative first. Increase only after checking the response.
-refLevelsDeg = [0 10 -10 20 -20 30 -30 0];
-refHoldTime = 8.0;                 % seconds per reference level
-maxRefRateDegPerSec = 8.0;         % smooth reference slope limit
-
-% Small bipolar probe amplitudes. These are added on top of the feedback command.
-% They are intentionally small because feedback is already holding the system.
-probeAmpList = [0.015 0.030 0.045 0.060];
-probePulseTime = 0.6;              % seconds
-probeRestTime  = 1.4;              % seconds
-
-% Command safety for the generated probe signal only.
-% The controller has its own final saturation.
-maxAbsProbe = 0.075;
-
-preRestTime  = 4.0;
-postRestTime = 4.0;
-
-%% ================================================================
-% Build reference and probe sequence
-% ================================================================
-
-thetaRefDegRaw = [];
-uProbeRaw = [];
-segmentInfo = {};
-
-% Initial rest at zero reference, no probe.
-[thetaRefDegRaw, uProbeRaw, segmentInfo] = appendSegment( ...
-    thetaRefDegRaw, uProbeRaw, segmentInfo, 0, 0, preRestTime, Ts, "initial rest");
-
-for k = 1:numel(refLevelsDeg)
-    refDeg = refLevelsDeg(k);
-
-    % Build a probe sequence that fits inside the hold interval.
-    [probeSegment, probeLabels] = makeProbeSegment( ...
-        probeAmpList, probePulseTime, probeRestTime, refHoldTime, Ts, maxAbsProbe);
-
-    n = numel(probeSegment);
-    thetaSegment = refDeg * ones(n, 1);
-
-    startIndex = numel(thetaRefDegRaw) + 1;
-    thetaRefDegRaw = [thetaRefDegRaw; thetaSegment]; %#ok<AGROW>
-    uProbeRaw      = [uProbeRaw; probeSegment]; %#ok<AGROW>
-    endIndex = numel(thetaRefDegRaw);
-
-    info.label = sprintf('reference %+g deg with probe sequence', refDeg);
-    info.startIndex = startIndex;
-    info.endIndex = endIndex;
-    info.startTime = (startIndex - 1) * Ts;
-    info.endTime = (endIndex - 1) * Ts;
-    info.probeLabels = probeLabels;
-    segmentInfo{end+1, 1} = info; %#ok<SAGROW>
-end
-
-% Final rest.
-[thetaRefDegRaw, uProbeRaw, segmentInfo] = appendSegment( ...
-    thetaRefDegRaw, uProbeRaw, segmentInfo, 0, 0, postRestTime, Ts, "final rest");
-
-% Smooth/rate-limit reference to avoid aggressive position steps.
-thetaRefDeg = rateLimitSignal(thetaRefDegRaw, Ts, maxRefRateDegPerSec);
-
-% Convert to radians for Simulink controller.
-thetaRefRad = deg2rad(thetaRefDeg(:));
-uProbe = uProbeRaw(:);
-
-t = (0:numel(thetaRefRad)-1)' * Ts;
-
-%% ================================================================
-% Create timeseries for From Workspace blocks
-% ================================================================
-
-theta1_ref_bias_id = timeseries(thetaRefRad, t);
-theta1_ref_bias_id.Name = 'theta1_ref_bias_id';
-
-u_probe_bias_id = timeseries(uProbe, t);
-u_probe_bias_id.Name = 'u_probe_bias_id';
+% Safety limits around theta_1 = pi
+thetaSoftLimitDeg = 70;            % soft recovery starts at +/-70 deg from pi
+thetaHardLimitDeg = 80;            % hard limit at +/-80 deg from pi
 
 theta_soft_limit_rad = deg2rad(thetaSoftLimitDeg);
 theta_hard_limit_rad = deg2rad(thetaHardLimitDeg);
 
-assignin('base', 'theta1_ref_bias_id', theta1_ref_bias_id);
+theta1_min_soft = theta1_equilibrium - theta_soft_limit_rad;
+theta1_max_soft = theta1_equilibrium + theta_soft_limit_rad;
+
+theta1_min_hard = theta1_equilibrium - theta_hard_limit_rad;
+theta1_max_hard = theta1_equilibrium + theta_hard_limit_rad;
+
+% Probe amplitudes.
+% Start conservative. Increase only after checking the recorded theta_1.
+ampList = [0.01 0.02 0.03 0.04 0.05 0.06 0.08];
+
+% Timing settings
+preRestTime  = 3.0;                % initial rest [s]
+pulseTime    = 1.0;                % duration of each probe pulse [s]
+restTime     = 2.0;                % rest between probe pulses [s]
+postRestTime = 3.0;                % final rest [s]
+
+% Number of repeats for each amplitude
+nRepeats = 2;
+
+% Input sign convention for the probe.
+% Keep +1 unless you know your command sign should be reversed.
+inputPolarity = 1;
+
+% Maximum absolute probe command.
+% The feedback controller will also saturate the final motor command.
+maxAbsProbe = 0.08;
+
+% Smooth command transitions slightly
+useRampEdges = true;
+rampTime = 0.15;                   % [s]
+
+%% ================================================================
+% Build probe input sequence
+% ================================================================
+
+u_probe = [];
+segmentInfo = {};
+
+[u_probe, segmentInfo] = appendConstant( ...
+    u_probe, segmentInfo, 0, preRestTime, Ts, "initial rest");
+
+for k = 1:numel(ampList)
+    A = ampList(k);
+
+    if A > maxAbsProbe
+        warning('Amplitude %.4f exceeds maxAbsProbe %.4f. Clipping.', A, maxAbsProbe);
+        A = maxAbsProbe;
+    end
+
+    for r = 1:nRepeats
+
+        % Positive first
+        [u_probe, segmentInfo] = appendPulsePair( ...
+            u_probe, segmentInfo, +A, pulseTime, restTime, Ts, ...
+            sprintf("A=%.3f repeat %d positive-first", A, r));
+
+        % Negative first
+        [u_probe, segmentInfo] = appendPulsePair( ...
+            u_probe, segmentInfo, -A, pulseTime, restTime, Ts, ...
+            sprintf("A=%.3f repeat %d negative-first", A, r));
+    end
+end
+
+[u_probe, segmentInfo] = appendConstant( ...
+    u_probe, segmentInfo, 0, postRestTime, Ts, "final rest");
+
+% Apply sign convention and probe saturation
+u_probe = inputPolarity * u_probe;
+u_probe = max(min(u_probe, maxAbsProbe), -maxAbsProbe);
+
+% Optional ramp smoothing
+if useRampEdges
+    u_probe = smoothCommandEdges(u_probe, Ts, rampTime);
+end
+
+% Time vector
+t = (0:numel(u_probe)-1)' * Ts;
+u_probe = u_probe(:);
+
+%% ================================================================
+% Create reference signal around theta_1 = pi
+% ================================================================
+
+theta1_ref = theta1_equilibrium * ones(size(t));
+
+u_probe_bias_id = timeseries(u_probe, t);
+u_probe_bias_id.Name = 'u_probe_bias_id';
+
+theta1_ref_bias_id = timeseries(theta1_ref, t);
+theta1_ref_bias_id.Name = 'theta1_ref_bias_id';
+
+%% ================================================================
+% Export to base workspace
+% ================================================================
+
 assignin('base', 'u_probe_bias_id', u_probe_bias_id);
+assignin('base', 'theta1_ref_bias_id', theta1_ref_bias_id);
+
+assignin('base', 'theta1_equilibrium', theta1_equilibrium);
 assignin('base', 'theta_soft_limit_rad', theta_soft_limit_rad);
 assignin('base', 'theta_hard_limit_rad', theta_hard_limit_rad);
+
+assignin('base', 'theta1_min_soft', theta1_min_soft);
+assignin('base', 'theta1_max_soft', theta1_max_soft);
+assignin('base', 'theta1_min_hard', theta1_min_hard);
+assignin('base', 'theta1_max_hard', theta1_max_hard);
+
 assignin('base', 'segmentInfo', segmentInfo);
+assignin('base', 'Ts_bias_id', Ts);
 
 save('closed_loop_motor_bias_id_signals.mat', ...
-    'theta1_ref_bias_id', ...
     'u_probe_bias_id', ...
+    'theta1_ref_bias_id', ...
+    'theta1_equilibrium', ...
     'theta_soft_limit_rad', ...
     'theta_hard_limit_rad', ...
+    'theta1_min_soft', ...
+    'theta1_max_soft', ...
+    'theta1_min_hard', ...
+    'theta1_max_hard', ...
     'segmentInfo', ...
     'Ts');
 
 fprintf('\nGenerated closed-loop motor bias identification signals.\n');
 fprintf('Total duration: %.2f s\n', t(end));
 fprintf('Sample time: %.4f s\n', Ts);
-fprintf('Reference range: %.1f to %.1f deg\n', min(thetaRefDeg), max(thetaRefDeg));
-fprintf('Probe range: %.4f to %.4f\n', min(uProbe), max(uProbe));
-fprintf('Saved to: closed_loop_motor_bias_id_signals.mat\n');
-fprintf('\nUse From Workspace variables:\n');
-fprintf('  theta1_ref_bias_id\n');
+fprintf('Maximum absolute probe command: %.4f\n', max(abs(u_probe)));
+fprintf('\nUse these From Workspace variables:\n');
 fprintf('  u_probe_bias_id\n');
+fprintf('  theta1_ref_bias_id\n');
+fprintf('\nSafety range around theta_1 = pi:\n');
+fprintf('  Soft range: %.4f rad to %.4f rad\n', theta1_min_soft, theta1_max_soft);
+fprintf('  Hard range: %.4f rad to %.4f rad\n', theta1_min_hard, theta1_max_hard);
+fprintf('\nSaved to closed_loop_motor_bias_id_signals.mat\n');
 
 %% ================================================================
-% Plot
+% Plot generated signals
 % ================================================================
 
-figure('Name', 'Closed-loop motor bias identification schedule', ...
-    'Units', 'normalized', 'Position', [0.08 0.12 0.84 0.72]);
+figure('Name', 'Closed-loop motor bias identification signals', ...
+    'Units', 'normalized', 'Position', [0.1 0.15 0.8 0.65]);
 
 tiledlayout(2, 1, 'TileSpacing', 'compact', 'Padding', 'compact');
 
 nexttile;
-plot(t, rad2deg(thetaRefRad), 'LineWidth', 1.2);
+plot(t, u_probe, 'LineWidth', 1.2);
 grid on;
-ylabel('\theta_{1,ref} [deg]');
-title('Feedback reference trajectory');
-yline(thetaSoftLimitDeg, '--');
-yline(-thetaSoftLimitDeg, '--');
-yline(thetaHardLimitDeg, ':');
-yline(-thetaHardLimitDeg, ':');
+xlabel('Time [s]');
+ylabel('u_{probe}');
+title('Probe input signal');
+
+yline(0, '--');
+ylim(1.2 * [-maxAbsProbe, maxAbsProbe]);
 
 nexttile;
-plot(t, uProbe, 'LineWidth', 1.2);
+plot(t, theta1_ref, 'LineWidth', 1.2);
 grid on;
-ylabel('u_{probe}');
 xlabel('Time [s]');
-title('Small probe command added inside feedback controller');
-yline(0, '--');
+ylabel('\theta_{1,ref} [rad]');
+title('\theta_1 reference signal');
+
+yline(theta1_equilibrium, '--', '\pi equilibrium');
+yline(theta1_min_soft, '--', 'soft min');
+yline(theta1_max_soft, '--', 'soft max');
+yline(theta1_min_hard, ':', 'hard min');
+yline(theta1_max_hard, ':', 'hard max');
 
 %% ================================================================
 % Local helper functions
 % ================================================================
 
-function [thetaRef, uProbe, segmentInfo] = appendSegment(thetaRef, uProbe, segmentInfo, refDeg, probeValue, duration, Ts, label)
+function [u, segmentInfo] = appendPulsePair(u, segmentInfo, A, pulseTime, restTime, Ts, label)
+
+    [u, segmentInfo] = appendConstant( ...
+        u, segmentInfo, A, pulseTime, Ts, label + " pulse 1");
+
+    [u, segmentInfo] = appendConstant( ...
+        u, segmentInfo, 0, restTime, Ts, label + " rest 1");
+
+    [u, segmentInfo] = appendConstant( ...
+        u, segmentInfo, -A, pulseTime, Ts, label + " pulse 2");
+
+    [u, segmentInfo] = appendConstant( ...
+        u, segmentInfo, 0, restTime, Ts, label + " rest 2");
+
+end
+
+function [u, segmentInfo] = appendConstant(u, segmentInfo, value, duration, Ts, label)
+
     n = max(1, round(duration / Ts));
-    startIndex = numel(thetaRef) + 1;
-    thetaRef = [thetaRef; refDeg * ones(n, 1)]; %#ok<AGROW>
-    uProbe   = [uProbe; probeValue * ones(n, 1)]; %#ok<AGROW>
-    endIndex = numel(thetaRef);
+
+    startIndex = numel(u) + 1;
+    u = [u; value * ones(n, 1)];
+    endIndex = numel(u);
 
     info.label = char(label);
+    info.value = value;
     info.startIndex = startIndex;
     info.endIndex = endIndex;
     info.startTime = (startIndex - 1) * Ts;
     info.endTime = (endIndex - 1) * Ts;
+
     segmentInfo{end+1, 1} = info;
+
 end
 
-function [probeSegment, labels] = makeProbeSegment(ampList, pulseTime, restTime, totalTime, Ts, maxAbsProbe)
-    probeSegment = [];
-    labels = {};
+function uSmooth = smoothCommandEdges(u, Ts, rampTime)
 
-    for k = 1:numel(ampList)
-        A = min(abs(ampList(k)), maxAbsProbe);
+    u = u(:);
+    uSmooth = u;
 
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels, +A, pulseTime, Ts, sprintf('+%.3f pulse', A));
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels,  0, restTime,  Ts, 'rest');
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels, -A, pulseTime, Ts, sprintf('-%.3f pulse', A));
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels,  0, restTime,  Ts, 'rest');
+    nRamp = max(1, round(rampTime / Ts));
 
-        % Repeat in opposite order to reduce ordering effects.
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels, -A, pulseTime, Ts, sprintf('-%.3f pulse', A));
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels,  0, restTime,  Ts, 'rest');
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels, +A, pulseTime, Ts, sprintf('+%.3f pulse', A));
-        [probeSegment, labels] = appendProbeValue(probeSegment, labels,  0, restTime,  Ts, 'rest');
+    changeIdx = find(abs(diff(u)) > 1e-12) + 1;
+
+    for k = 1:numel(changeIdx)
+        idx0 = changeIdx(k);
+
+        idxStart = idx0;
+        idxEnd = min(numel(u), idx0 + nRamp - 1);
+
+        if idx0 <= 1
+            previousValue = u(idx0);
+        else
+            previousValue = uSmooth(idx0 - 1);
+        end
+
+        newValue = u(idx0);
+        ramp = linspace(previousValue, newValue, idxEnd - idxStart + 1)';
+
+        uSmooth(idxStart:idxEnd) = ramp;
     end
 
-    nTotal = max(1, round(totalTime / Ts));
-
-    if numel(probeSegment) < nTotal
-        probeSegment = [probeSegment; zeros(nTotal - numel(probeSegment), 1)];
-    else
-        probeSegment = probeSegment(1:nTotal);
-    end
-end
-
-function [x, labels] = appendProbeValue(x, labels, value, duration, Ts, label)
-    n = max(1, round(duration / Ts));
-    x = [x; value * ones(n, 1)]; %#ok<AGROW>
-    labels{end+1, 1} = char(label);
-end
-
-function y = rateLimitSignal(x, Ts, maxRate)
-    x = x(:);
-    y = zeros(size(x));
-    y(1) = x(1);
-    maxStep = maxRate * Ts;
-
-    for k = 2:numel(x)
-        delta = x(k) - y(k-1);
-        delta = max(min(delta, maxStep), -maxStep);
-        y(k) = y(k-1) + delta;
-    end
 end
