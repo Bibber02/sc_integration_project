@@ -41,7 +41,7 @@ theta1_max_hard = theta1_equilibrium + theta_hard_limit_rad;
 
 % Probe amplitudes.
 % Start conservative. Increase only after checking the recorded theta_1.
-ampList = [0.01 0.02 0.03 0.04 0.05 0.06 0.08];
+ampList = [0.2 0.3 0.4 0.5 0.6 0.8 0.9];
 
 % Timing settings
 preRestTime  = 3.0;                % initial rest [s]
@@ -58,7 +58,7 @@ inputPolarity = 1;
 
 % Maximum absolute probe command.
 % The feedback controller will also saturate the final motor command.
-maxAbsProbe = 0.08;
+maxAbsProbe = 1;
 
 % Smooth command transitions slightly
 useRampEdges = true;
