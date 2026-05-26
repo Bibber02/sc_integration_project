@@ -1,0 +1,157 @@
+greybox_id_full
+Successfully loaded Stribeck parameters for the passive link.
+
+Starting grey-box estimation for active linkage...
+
+Training fit (theta1, theta2):
+   94.3657
+   62.4794
+
+
+Validation fit (theta1, theta2):
+   14.9647
+   12.5448
+
+
+======================================================
+             FINAL ESTIMATION STATISTICS                
+======================================================
+
+Estimated Active Parameters (± 1 Standard Deviation):
+------------------------------------------------------
+p_a      :    35.5394  ±  1.9652    
+p_b1     :   743.9043  ±  23.8079   
+p_c1     :    52.5248  ±  25.6278   
+p_g1     :   109.3843  ±  3.4534    
+p_u      :  4299.5538  ±  180.0187  
+p_0      :   -42.1999  ±  1.4349    
+
+Final Loss Function (Cost): 0.813439
+======================================================
+
+greybox_id_full
+Successfully loaded Stribeck parameters for the passive link.
+
+Starting grey-box estimation for active linkage...
+
+Training fit (theta1, theta2):
+   55.1741
+   40.5675
+
+
+Validation fit (theta1, theta2):
+   41.4932
+   32.6288
+
+
+======================================================
+             FINAL ESTIMATION STATISTICS                
+======================================================
+
+Estimated Active Parameters (± 1 Standard Deviation):
+------------------------------------------------------
+p_a      :    39.9990  ±  7.8220    
+p_b1     :   795.0765  ±  101.4231  
+p_c1     :    90.9055  ±  109.2545  
+p_g1     :    20.0085  ±  4.7833    
+p_u      :  3685.1483  ±  690.2047  
+p_0      :    -9.5755  ±  3.1319    
+
+Final Loss Function (Cost): 3.54426
+======================================================
+
+greybox_id_full
+
+======================================================
+Starting Full System Identification run...
+======================================================
+
+{Unrecognized property 'SearchMethod' for class 'idoptions.search.lsqnonlin'.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full', 'C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\greybox_id_full.m', 133)" style="font-weight:bold">greybox_id_full</a> (<a href="matlab: opentoline('C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\greybox_id_full.m',133,0)">line 133</a>)
+opt.SearchOptions.SearchMethod = 'lm';
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+greybox_id_full
+
+======================================================
+Starting Full System Identification run...
+======================================================
+
+{Unrecognized property 'Algorithm' for class 'idoptions.search.lsqnonlin'.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full', 'C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\greybox_id_full.m', 135)" style="font-weight:bold">greybox_id_full</a> (<a href="matlab: opentoline('C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\greybox_id_full.m',135,0)">line 135</a>)
+opt.SearchOptions.Algorithm = 'levenberg-marquardt';
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+greybox_id_full
+
+======================================================
+Starting Full System Identification run...
+======================================================
+
+
+Starting grey-box estimation for active linkage (Levenberg-Marquardt)...
+
+Training fit (theta1, theta2):
+   94.2476
+   62.5126
+
+
+Validation fit (theta1, theta2):
+   79.3066
+   76.1085
+
+
+======================================================
+             FINAL ESTIMATION STATISTICS                
+======================================================
+
+Estimated Active Parameters (± 1 Standard Deviation):
+------------------------------------------------------
+p_a      :    40.7433  ±  2.0356    
+p_b1     :   778.5031  ±  23.3033   
+p_c1     :   100.0000  ±  27.0444   
+p_g1     :   118.4242  ±  3.5673    
+p_u      :  4822.2751  ±  207.1201  
+p_0      :   -45.5657  ±  1.4836    
+
+Final Loss Function (Cost): 0.812083
+======================================================
+
+Model saved to active_rod_identification_result.mat
+
+======================================================
+Starting Full System Identification run...
+======================================================
+
+
+Starting grey-box estimation for active linkage (Levenberg-Marquardt)...
+
+Training fit (theta1, theta2):
+   94.4357
+   62.4758
+
+
+Validation fit (theta1, theta2):
+   79.0635
+   75.8757
+
+
+======================================================
+             FINAL ESTIMATION STATISTICS                
+======================================================
+
+Estimated Active Parameters (± 1 Standard Deviation):
+------------------------------------------------------
+p_a      :    33.6175  ±  1.7434    
+p_b1     :   744.5341  ±  22.2139   
+p_c1     :    23.9089  ±  16.4972   
+p_g1     :   105.6867  ±  3.0158    
+p_u      :  4091.4423  ±  128.3169  
+p_0      :   -40.8063  ±  1.2669    
+
+Final Loss Function (Cost): 0.813547
+======================================================
+
+Model saved to active_rod_identification_result.mat
