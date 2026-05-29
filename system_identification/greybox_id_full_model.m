@@ -18,8 +18,8 @@ l1 = 0.10;   % [m]
 p_c = l1 * p_g2 / g;
 
 % States
-theta1     = x(1);
-theta2     = x(2);
+theta1 = x(1);
+theta2 = x(2);
 theta1_dot = x(3);
 theta2_dot = x(4);
 
