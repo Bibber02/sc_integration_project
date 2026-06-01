@@ -5,7 +5,7 @@ Ad = linsys1_d.A;
 Bd = linsys1_d.B;
 Cd = linsys1_d.C;
 
-Qz_d = diag([1, 0.1, 1, 0.1]);
+Qz_d = diag([3, 1, 5, 1]);
 R_d  = 1;
 
 % Redesign LQR in discrete time
