@@ -5,7 +5,7 @@ delayTime = 1.0;
 N         = Tsim/Ts + 1;
 
 
-amplitude = 0.15;     % signal switches between -0.15 and +0.15
+amplitude = 0.2;     % signal switches between -0.15 and +0.15
 clockSamples = 10;    % hold each PRBS value for 25 samples = 0.25 s
 
 Range = [-amplitude amplitude];
