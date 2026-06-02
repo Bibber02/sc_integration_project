@@ -1,54 +1,69 @@
+Ts = 0.01;
 
-Ts = 0.01;                 % Same as your sensor/sample time
-A_values = [0.25 0.35 0.45 0.55];
-f_tri = 0.25;              % Hz, one period every 20 s
+% Motor deadband starts around 0.2, so stay above it.
+A_values = [0.2 0.25 0.3];
 
-zeroTime = 2;             % seconds between blocks
-blockTime = 10;            % seconds per amplitude block
+zeroStart = 3;     % initial zero time [s]
+holdTime  = 2;     % command hold time [s]
+zeroTime  = 2;     % zero between pulses [s]
+nRepeats  = 2;     % repeat full amplitude sequence
 
 t_all = [];
 u_all = [];
-
 t_current = 0;
 
-% Initial zero section
-t_block = (0:Ts:zeroTime-Ts).';
+% Initial zero
+t_block = (0:Ts:zeroStart-Ts).';
 u_block = zeros(size(t_block));
 
 t_all = [t_all; t_current + t_block];
 u_all = [u_all; u_block];
 t_current = t_all(end) + Ts;
 
-for k = 1:length(A_values)
+for r = 1:nRepeats
+    for k = 1:length(A_values)
 
-    A = A_values(k);
+        A = A_values(k);
 
-    % Triangle wave section
-    t_block = (0:Ts:blockTime-Ts).';
+        % Positive pulse
+        t_block = (0:Ts:holdTime-Ts).';
+        u_block = A * ones(size(t_block));
 
-    % Triangle between -1 and +1
-    tri = sawtooth(2*pi*f_tri*t_block, 0.5);
+        t_all = [t_all; t_current + t_block];
+        u_all = [u_all; u_block];
+        t_current = t_all(end) + Ts;
 
-    u_block = A * tri;
+        % Zero
+        t_block = (0:Ts:zeroTime-Ts).';
+        u_block = zeros(size(t_block));
 
-    t_all = [t_all; t_current + t_block];
-    u_all = [u_all; u_block];
-    t_current = t_all(end) + Ts;
+        t_all = [t_all; t_current + t_block];
+        u_all = [u_all; u_block];
+        t_current = t_all(end) + Ts;
 
-    % Zero section after each amplitude
-    t_block = (0:Ts:zeroTime-Ts).';
-    u_block = zeros(size(t_block));
+        % Negative pulse
+        t_block = (0:Ts:holdTime-Ts).';
+        u_block = -A * ones(size(t_block));
 
-    t_all = [t_all; t_current + t_block];
-    u_all = [u_all; u_block];
-    t_current = t_all(end) + Ts;
+        t_all = [t_all; t_current + t_block];
+        u_all = [u_all; u_block];
+        t_current = t_all(end) + Ts;
+
+        % Zero
+        t_block = (0:Ts:zeroTime-Ts).';
+        u_block = zeros(size(t_block));
+
+        t_all = [t_all; t_current + t_block];
+        u_all = [u_all; u_block];
+        t_current = t_all(end) + Ts;
+    end
 end
 
 u_motor_bias = timeseries(u_all, t_all);
 
 figure;
-plot(t_all, u_all);
+plot(t_all, u_all, 'LineWidth', 1.2);
 grid on;
 xlabel('Time [s]');
 ylabel('Input command');
-title('Motor bias / deadzone / hysteresis identification input');
+title('Motor bias ID input: paired positive/negative pulses');
