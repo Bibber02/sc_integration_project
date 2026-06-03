@@ -1,0 +1,213 @@
+
+======================================================
+Starting full-system identification with new data
+Passive-link parameters are locked/fixed
+======================================================
+
+Identification runs: 1, 3, 5, 7, 9 for both PRBS and chirp
+Validation runs:     2, 4, 6, 8, 10 for both PRBS and chirp
+
+Number of identification experiments: 10
+Number of validation experiments:     10
+
+
+======================================================
+Stage 1: estimating active parameters with p_c1 fixed
+Free parameters: p_a, p_b1, p_g1, p_u, p_0
+Fixed parameters: p_c1 and all passive-link parameters
+======================================================
+
+
+Stage 1 parameter values:
+p_a        =      39.0311   estimated
+p_b1       =      1918.11   estimated
+p_c1       =            0   fixed
+p_g1       =      157.768   estimated
+p_u        =        12000   estimated
+p_0        =            0   fixed
+p_b2       =    0.0670288   fixed
+p_g2       =      112.027   fixed
+p_c2       =     0.249089   fixed
+p_sdelta2  =     0.183602   fixed
+v_s2       =          3.5   fixed
+eps_v1     =         0.05   fixed
+eps_v2     =         0.03   fixed
+
+Stage 1 mean identification fit: 69.65 %
+
+======================================================
+Stage 2: estimating final active parameter set
+Free parameters: p_a, p_b1, p_c1, p_g1, p_u, p_0
+Fixed parameters: all passive-link parameters and smoothing constants
+======================================================
+
+{Operation terminated by user during idutils_private
+
+
+In idnlgrey/getSensitivityRefined
+
+In idnlgrey/getSensitivityRefined
+
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/getErrorAndJacobian', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m', 75)" style="font-weight:bold">idnlgrey/getErrorAndJacobian</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m',75,0)">line 75</a>)
+      [jac, ~] = getSensitivityRefined(nlsys, data, parinfo);
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize/LocalCostFun', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 82)" style="font-weight:bold">idestimatorpack.idminimizer/minimize/LocalCostFun</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',82,0)">line 82</a>)
+         getErrorAndJacobian(this.Model, Data, this.Info, this.Options, JacRequest);
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idminimizer', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m', 84)" style="font-weight:bold">idminimizer</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m',84,0)">line 84</a>)
+[resnorm, EtE, e, J] = feval(costfun, x);
+                       ^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 47)" style="font-weight:bold">idestimatorpack.idminimizer/minimize</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',47,0)">line 47</a>)
+   idminimizer(@LocalCostFun, p, pinfo.Minimum, pinfo.Maximum, this.Options, this);
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/pem_', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m', 78)" style="font-weight:bold">idnlgrey/pem_</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m',78,0)">line 78</a>)
+   optiminfo = minimize(Estimator);
+               ^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m', 72)" style="font-weight:bold">idnlgrey/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m',72,0)">line 72</a>)
+   [nlsys, data] = pem_(nlsys, data, 'nlgreyest', dataName, inputArgs{:});
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('iddata/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m', 1208)" style="font-weight:bold">iddata/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m',1208,0)">line 1208</a>)
+                    [varargout{1:nargout}] = nlgreyest(m,z,varargin{:});
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data_locked_passive', 'D:\school\sc_integration_project\system_identification\full_system\results_with_p0\greybox_id_full_new_data_locked_passive.m', 331)" style="font-weight:bold">greybox_id_full_new_data_locked_passive</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\results_with_p0\greybox_id_full_new_data_locked_passive.m',331,0)">line 331</a>)
+model_est = nlgreyest(zEst, model_stage2_start, opt2);
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+{Operation terminated by user during matlab.graphics.internal.toolstrip.FigureToolstripManager.getCodeGenState
+
+
+In matlab.graphics.internal.toolstrip.FigureToolstripManager.updateCodeGenState
+
+In matlab.graphics.internal.toolstrip.FigureToolstripManager.updategcf
+} 
+{Operation terminated by user during message.internal.executeCallback
+} 
+{Operation terminated by user during <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('hggetbehavior', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\hggetbehavior.m', 68)" style="font-weight:bold">hggetbehavior</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\hggetbehavior.m',68,0)">line 68</a>)
+
+
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('isplotchild>validDataBehavior', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\isplotchild.m', 77)" style="font-weight:bold">isplotchild>validDataBehavior</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\isplotchild.m',77,0)">line 77</a>)
+    hBehavior = hggetbehavior(obj,'DataDescriptor','-peek');
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('isplotchild', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\isplotchild.m', 35)" style="font-weight:bold">isplotchild</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\isplotchild.m',35,0)">line 35</a>)
+    if  isvalid(obj) && validDataBehavior(obj, bfmode) && ...
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('plotchild', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\plotchild.m', 41)" style="font-weight:bold">plotchild</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\specgraph\plotchild.m',41,0)">line 41</a>)
+        ok(k) = isplotchild(ch(k), dim, bfmode);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In matlab.plottools.service.accessor.BaseAxesAccessor
+
+In matlab.plottools.service.accessor.BaseAxesAccessor/supportsBasicFitting
+
+In matlab.plottools.service.accessor.BaseAccessor>@()obj.supportsBasicFitting()
+
+In matlab.plottools.service.accessor.BaseAccessor/isSupported
+
+In matlab.plottools.service.accessor.BaseAccessor/getSupportedFeatures
+
+In matlab.graphics.internal.toolstrip.FigureToolstripManager.getSupportedFeatures
+
+In matlab.graphics.internal.toolstrip.FigureToolstripManager.updateToolstripState
+
+In matlab.graphics.internal.toolstrip.FigureToolstripStateListeners/updategca
+
+In matlab.graphics.internal.toolstrip.FigureToolstripStateListeners>@(~,~)this.updategca(hFig)
+
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.graphics.internal.DrawnowCallbackThrottle/drawnowCallback', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\+matlab\+graphics\+internal\DrawnowCallbackThrottle.m', 66)" style="font-weight:bold">matlab.graphics.internal.DrawnowCallbackThrottle/drawnowCallback</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\+matlab\+graphics\+internal\DrawnowCallbackThrottle.m',66,0)">line 66</a>)
+                feval(obj.CallbackMap(actionID));
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('matlab.graphics.internal.DrawnowCallbackThrottle>@(~)obj.drawnowCallback(actionID)', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\+matlab\+graphics\+internal\DrawnowCallbackThrottle.m', 58)" style="font-weight:bold">matlab.graphics.internal.DrawnowCallbackThrottle>@(~)obj.drawnowCallback(actionID)</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\graphics\graphics\+matlab\+graphics\+internal\DrawnowCallbackThrottle.m',58,0)">line 58</a>)
+                matlab.graphics.internal.drawnow.callback(@(~) obj.drawnowCallback(actionID));
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+greybox_id_full_new_data_locked_passive
+
+======================================================
+Starting full-system identification with new data
+Passive-link parameters are locked/fixed
+======================================================
+
+Identification runs: 1, 3, 5, 7, 9 for both PRBS and chirp
+Validation runs:     2, 4, 6, 8, 10 for both PRBS and chirp
+
+Number of identification experiments: 10
+Number of validation experiments:     10
+
+
+======================================================
+Stage 1: estimating active parameters with p_c1 fixed
+Free parameters: p_a, p_b1, p_g1, p_u, p_0
+Fixed parameters: p_c1 and all passive-link parameters
+======================================================
+
+
+Stage 1 parameter values:
+p_a        =       50.009   estimated
+p_b1       =      2575.88   estimated
+p_c1       =            0   fixed
+p_g1       =          200   estimated
+p_u        =      16156.8   estimated
+p_0        =            0   fixed
+p_b2       =    0.0670288   fixed
+p_g2       =      112.027   fixed
+p_c2       =     0.249089   fixed
+p_sdelta2  =     0.183602   fixed
+v_s2       =          3.5   fixed
+eps_v1     =         0.05   fixed
+eps_v2     =         0.03   fixed
+
+Stage 1 mean identification fit: 69.85 %
+
+======================================================
+Stage 2: estimating final active parameter set
+Free parameters: p_a, p_b1, p_c1, p_g1, p_u, p_0
+Fixed parameters: all passive-link parameters and smoothing constants
+======================================================
+
+{Operation terminated by user during idutils_private
+
+
+In idnlgrey/getSensitivityRefined
+
+In idnlgrey/getSensitivityRefined
+
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/getErrorAndJacobian', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m', 75)" style="font-weight:bold">idnlgrey/getErrorAndJacobian</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m',75,0)">line 75</a>)
+      [jac, ~] = getSensitivityRefined(nlsys, data, parinfo);
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize/LocalCostFun', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 82)" style="font-weight:bold">idestimatorpack.idminimizer/minimize/LocalCostFun</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',82,0)">line 82</a>)
+         getErrorAndJacobian(this.Model, Data, this.Info, this.Options, JacRequest);
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idminimizer', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m', 202)" style="font-weight:bold">idminimizer</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m',202,0)">line 202</a>)
+   [resnorm, ~, e, J] = feval(costfun,x);
+                        ^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 47)" style="font-weight:bold">idestimatorpack.idminimizer/minimize</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',47,0)">line 47</a>)
+   idminimizer(@LocalCostFun, p, pinfo.Minimum, pinfo.Maximum, this.Options, this);
+   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/pem_', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m', 78)" style="font-weight:bold">idnlgrey/pem_</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m',78,0)">line 78</a>)
+   optiminfo = minimize(Estimator);
+               ^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m', 72)" style="font-weight:bold">idnlgrey/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m',72,0)">line 72</a>)
+   [nlsys, data] = pem_(nlsys, data, 'nlgreyest', dataName, inputArgs{:});
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('iddata/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m', 1208)" style="font-weight:bold">iddata/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m',1208,0)">line 1208</a>)
+                    [varargout{1:nargout}] = nlgreyest(m,z,varargin{:});
+                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data_locked_passive', 'D:\school\sc_integration_project\system_identification\full_system\results_with_p0\greybox_id_full_new_data_locked_passive.m', 331)" style="font-weight:bold">greybox_id_full_new_data_locked_passive</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\results_with_p0\greybox_id_full_new_data_locked_passive.m',331,0)">line 331</a>)
+model_est = nlgreyest(zEst, model_stage2_start, opt2);
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+{Operation terminated by user during <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.FormatDataUtils.formatDataBlockForMixedView', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\@FormatDataUtils\formatDataBlockForMixedView.m', 37)" style="font-weight:bold">internal.matlab.datatoolsservices.FormatDataUtils.formatDataBlockForMixedView</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\@FormatDataUtils\formatDataBlockForMixedView.m',37,0)">line 37</a>)
+
+
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.WSBUtil.getEditValue', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m', 345)" style="font-weight:bold">internal.matlab.datatoolsservices.WSBUtil.getEditValue</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m',345,0)">line 345</a>)
+                [c, ~, m] = internal.matlab.datatoolsservices.FormatDataUtils.formatDataBlockForMixedView(1, 1, 1, 1, {var}, currentFormat);
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m', 237)" style="font-weight:bold">internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m',237,0)">line 237</a>)
+                                [t(idx).Value, t(idx).IsSummary] = internal.matlab.datatoolsservices.WSBUtil.getEditValue(var, currentFormat);
+                                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.WSBUtil.getWorkspaceDisplay', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m', 56)" style="font-weight:bold">internal.matlab.datatoolsservices.WSBUtil.getWorkspaceDisplay</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m',56,0)">line 56</a>)
+                info = internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct( ...
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+[Warning: An error occurred while drawing the scene: Could not find node in peer tree during replaceChild] 
+[Warning: An error occurred while drawing the scene: Error in SceneTree: Could not find node in replaceChild] 
+greybox_id_full_new_data_locked_passive
