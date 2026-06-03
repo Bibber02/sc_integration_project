@@ -205,12 +205,12 @@ parameter_names = {'p_a', 'p_b1', 'p_c1', 'p_g1', 'p_u', 'p_0', ...
     'p_b2', 'p_g2', 'p_c2', 'p_sdelta2', 'v_s2', 'eps_v1', 'eps_v2'};
 
 minimum_values = [5, 100, 0, 5, 500, -200, 0, 0, 0, 0, 0.02, 0.001, 0.001];
-maximum_values = [80, 4000, 250, 400, 30000, 200, Inf, Inf, Inf, Inf, 20, 1, 1];
+maximum_values = [80, 4000, 400, 400, 30000, 200, Inf, Inf, Inf, Inf, 20, 1, 1];
 
 % Stage 1:
 % Estimate p_a, p_b1, p_g1, p_u and p_0.
 % Keep p_c1 fixed at zero first, and keep all passive-link parameters fixed.
-fixed_stage1 = [false, false, true, false, false, true, ...
+fixed_stage1 = [false, false, true, false, false, false, ...
                 true,  true,  true, true,  true,  true, true];
 
 for k = 1:length(parameter_names)
