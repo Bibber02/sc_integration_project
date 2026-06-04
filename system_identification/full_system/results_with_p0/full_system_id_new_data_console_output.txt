@@ -1,98 +1,6 @@
 
 ======================================================
 Starting full-system identification with new data
-======================================================
-
-Identification runs: odd PRBS + odd chirp runs
-Validation runs:     even PRBS + even chirp runs
-
-{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load')" style="font-weight:bold">load</a>
-prbs\fullsystem_prbs_A0p16_run01.mat is not found in the current folder or on the MATLAB path, but exists in:
-    D:\school\sc_integration_project\system_identification\full_system\measurement_data
-
-<a href = "matlab:internal.matlab.desktop.commandwindow.executeCommandForUser('cd ''D:\school\sc_integration_project\system_identification\full_system\measurement_data''')">Change the MATLAB current folder</a> or <a href = "matlab:internal.matlab.desktop.commandwindow.executeCommandForUser('addpath ''D:\school\sc_integration_project\system_identification\full_system\measurement_data''')">add its folder to the MATLAB path</a>.
-
-Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data>makeExperiment', 'D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m', 232)" style="font-weight:bold">greybox_id_full_new_data>makeExperiment</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m',232,0)">line 232</a>)
-data = load(filename, 'theta_1', 'theta_2', 'u_ts');
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data', 'D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m', 40)" style="font-weight:bold">greybox_id_full_new_data</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m',40,0)">line 40</a>)
-    [zPrbs,  x0Prbs]  = makeExperiment(prbsFile,  Ts, inputSign);
-                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-} 
-greybox_id_full_new_data
-
-======================================================
-Starting full-system identification with new data
-======================================================
-
-Identification runs: odd PRBS + odd chirp runs
-Validation runs:     even PRBS + even chirp runs
-
-
-Starting nonlinear grey-box estimation...
-{Operation terminated by user during idutils_private
-
-
-In idnlgrey/getSensitivityRefined
-
-In idnlgrey/getSensitivityRefined
-
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/getErrorAndJacobian', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m', 75)" style="font-weight:bold">idnlgrey/getErrorAndJacobian</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\getErrorAndJacobian.m',75,0)">line 75</a>)
-      [jac, ~] = getSensitivityRefined(nlsys, data, parinfo);
-                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize/LocalCostFun', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 82)" style="font-weight:bold">idestimatorpack.idminimizer/minimize/LocalCostFun</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',82,0)">line 82</a>)
-         getErrorAndJacobian(this.Model, Data, this.Info, this.Options, JacRequest);
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idminimizer', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m', 202)" style="font-weight:bold">idminimizer</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\idminimizer.m',202,0)">line 202</a>)
-   [resnorm, ~, e, J] = feval(costfun,x);
-                        ^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idestimatorpack.idminimizer/minimize', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m', 47)" style="font-weight:bold">idestimatorpack.idminimizer/minimize</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\idutils\+idestimatorpack\@idminimizer\minimize.m',47,0)">line 47</a>)
-   idminimizer(@LocalCostFun, p, pinfo.Minimum, pinfo.Maximum, this.Options, this);
-   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/pem_', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m', 78)" style="font-weight:bold">idnlgrey/pem_</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\pem_.m',78,0)">line 78</a>)
-   optiminfo = minimize(Estimator);
-               ^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('idnlgrey/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m', 72)" style="font-weight:bold">idnlgrey/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\nlident\@idnlgrey\nlgreyest.m',72,0)">line 72</a>)
-   [nlsys, data] = pem_(nlsys, data, 'nlgreyest', dataName, inputArgs{:});
-                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('iddata/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m', 1208)" style="font-weight:bold">iddata/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m',1208,0)">line 1208</a>)
-                    [varargout{1:nargout}] = nlgreyest(m,z,varargin{:});
-                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data', 'D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m', 148)" style="font-weight:bold">greybox_id_full_new_data</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data.m',148,0)">line 148</a>)
-model_est = nlgreyest(zEst, model0, opt);
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-} 
-{Operation terminated by user during <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m', 231)" style="font-weight:bold">internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m',231,0)">line 231</a>)
-
-
-In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('internal.matlab.datatoolsservices.WSBUtil.getWorkspaceDisplay', 'C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m', 56)" style="font-weight:bold">internal.matlab.datatoolsservices.WSBUtil.getWorkspaceDisplay</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\matlab\datatools\datatoolsservices\matlab\+internal\+matlab\+datatoolsservices\WSBUtil.m',56,0)">line 56</a>)
-                info = internal.matlab.datatoolsservices.WSBUtil.getDisplayStruct( ...
-                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-} 
-greybox_id_full_new_data_locked_passive
-
-======================================================
-Starting full-system identification with new data
-Passive-link parameters are locked/fixed
-======================================================
-
-Identification runs: 1, 3, 5, 7, 9 for both PRBS and chirp
-Validation runs:     2, 4, 6, 8, 10 for both PRBS and chirp
-
-{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('load')" style="font-weight:bold">load</a>
-prbs\fullsystem_prbs_A0p16_run01.mat is not found in the current folder or on the MATLAB path, but exists in:
-    D:\school\sc_integration_project\system_identification\full_system\measurement_data
-
-<a href = "matlab:internal.matlab.desktop.commandwindow.executeCommandForUser('cd ''D:\school\sc_integration_project\system_identification\full_system\measurement_data''')">Change the MATLAB current folder</a> or <a href = "matlab:internal.matlab.desktop.commandwindow.executeCommandForUser('addpath ''D:\school\sc_integration_project\system_identification\full_system\measurement_data''')">add its folder to the MATLAB path</a>.
-
-Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('greybox_id_full_new_data_locked_passive', 'D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data_locked_passive.m', 77)" style="font-weight:bold">greybox_id_full_new_data_locked_passive</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\full_system\greybox_id_full_new_data_locked_passive.m',77,0)">line 77</a>)
-    load(prbsFile, 'theta_1', 'theta_2', 'u_ts');
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-} 
-greybox_id_full_new_data_locked_passive
-
-======================================================
-Starting full-system identification with new data
 Passive-link parameters are locked/fixed
 ======================================================
 
@@ -111,12 +19,12 @@ Fixed parameters: p_c1 and all passive-link parameters
 
 
 Stage 1 parameter values:
-p_a        =      31.4554   estimated
-p_b1       =         1500   estimated
+p_a        =      59.0125   estimated
+p_b1       =      3982.27   estimated
 p_c1       =            0   fixed
-p_g1       =      127.879   estimated
-p_u        =      9770.64   estimated
-p_0        =      1.52117   estimated
+p_g1       =      299.978   estimated
+p_u        =      24781.5   estimated
+p_0        =      19.6119   estimated
 p_b2       =    0.0670288   fixed
 p_g2       =      112.027   fixed
 p_c2       =     0.249089   fixed
@@ -125,7 +33,7 @@ v_s2       =          3.5   fixed
 eps_v1     =         0.05   fixed
 eps_v2     =         0.03   fixed
 
-Stage 1 mean identification fit: 67.80 %
+Stage 1 mean identification fit: 71.50 %
 
 ======================================================
 Stage 2: estimating final active parameter set
@@ -154,8 +62,8 @@ Final validation fit, per experiment and output:
     {2×1 double}    {2×1 double}
 
 
-Final mean identification fit: 78.51 %
-Final mean validation fit:     58.71 %
+Final mean identification fit: 80.83 %
+Final mean validation fit:     65.46 %
 
 ======================================================
 Final parameter values and uncertainty
@@ -164,45 +72,45 @@ Final parameter values and uncertainty
       <strong>Parameter</strong>       <strong>Value</strong>      <strong>Fixed</strong>    <strong>Variance</strong>    <strong>StdDev</strong>     <strong>RelativeStdPercent</strong>
     <strong>_____________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>________</strong>    <strong>_______</strong>    <strong>__________________</strong>
 
-    {'p_a'      }      9.2869    false     0.23601    0.48581          5.2312      
-    {'p_b1'     }      1414.4    false      71.982     8.4842         0.59984      
-    {'p_c1'     }         250    false      5.9493     2.4391         0.97565      
-    {'p_g1'     }         200    false     0.72422    0.85101         0.42551      
-    {'p_u'      }       10232    false      3050.1     55.227         0.53976      
-    {'p_0'      }      -28.84    false    0.023945    0.15474         0.53655      
-    {'p_b2'     }    0.067029    true          NaN        NaN             NaN      
-    {'p_g2'     }      112.03    true          NaN        NaN             NaN      
-    {'p_c2'     }     0.24909    true          NaN        NaN             NaN      
-    {'p_sdelta2'}      0.1836    true          NaN        NaN             NaN      
-    {'v_s2'     }         3.5    true          NaN        NaN             NaN      
-    {'eps_v1'   }        0.05    true          NaN        NaN             NaN      
-    {'eps_v2'   }        0.03    true          NaN        NaN             NaN      
+    {'p_a'      }      17.594    false    0.28896     0.53755          3.0553      
+    {'p_b1'     }        2075    false      127.2      11.278         0.54353      
+    {'p_c1'     }         250    false     5.7489      2.3977         0.95907      
+    {'p_g1'     }      269.08    false      1.398      1.1824         0.43941      
+    {'p_u'      }       14102    false     5029.8      70.921         0.50293      
+    {'p_0'      }     -28.455    false    0.04139     0.20345         0.71498      
+    {'p_b2'     }    0.067029    true         NaN         NaN             NaN      
+    {'p_g2'     }      112.03    true         NaN         NaN             NaN      
+    {'p_c2'     }     0.24909    true         NaN         NaN             NaN      
+    {'p_sdelta2'}      0.1836    true         NaN         NaN             NaN      
+    {'v_s2'     }         3.5    true         NaN         NaN             NaN      
+    {'eps_v1'   }        0.05    true         NaN         NaN             NaN      
+    {'eps_v2'   }        0.03    true         NaN         NaN             NaN      
 
 
 Free-parameter covariance matrix:
    1.0e+03 *
 
-    0.0002   -0.0006    0.0004   -0.0001   -0.0023    0.0000
-   -0.0006    0.0720    0.0028    0.0067    0.4615   -0.0002
-    0.0004    0.0028    0.0059    0.0008    0.0404   -0.0001
-   -0.0001    0.0067    0.0008    0.0007    0.0449   -0.0001
-   -0.0023    0.4615    0.0404    0.0449    3.0501   -0.0021
-    0.0000   -0.0002   -0.0001   -0.0001   -0.0021    0.0000
+    0.0003   -0.0013    0.0005    0.0000   -0.0058   -0.0001
+   -0.0013    0.1272    0.0049    0.0122    0.7940    0.0000
+    0.0005    0.0049    0.0057    0.0014    0.0494   -0.0004
+    0.0000    0.0122    0.0014    0.0014    0.0793   -0.0001
+   -0.0058    0.7940    0.0494    0.0793    5.0298   -0.0011
+   -0.0001    0.0000   -0.0004   -0.0001   -0.0011    0.0000
 
 
 Free-parameter correlation matrix:
-               <strong>p_a</strong>         <strong>p_b1</strong>        <strong>p_c1</strong>        <strong>p_g1</strong>         <strong>p_u</strong>         <strong>p_0</strong>   
-            <strong>_________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>_________</strong>    <strong>________</strong>
+              <strong>p_a</strong>         <strong>p_b1</strong>        <strong>p_c1</strong>        <strong>p_g1</strong>        <strong>p_u</strong>         <strong>p_0</strong>   
+            <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>
 
-    <strong>p_a </strong>            1    -0.14586     0.29922    -0.13813    -0.084405     0.30664
-    <strong>p_b1</strong>     -0.14586           1     0.13643     0.92997       0.9849    -0.18923
-    <strong>p_c1</strong>      0.29922     0.13643           1     0.36317      0.30021    -0.39198
-    <strong>p_g1</strong>     -0.13813     0.92997     0.36317           1      0.95443    -0.46755
-    <strong>p_u </strong>    -0.084405      0.9849     0.30021     0.95443            1     -0.2399
-    <strong>p_0 </strong>      0.30664    -0.18923    -0.39198    -0.46755      -0.2399           1
+    <strong>p_a </strong>           1    -0.20905     0.37804    0.044037    -0.15137    -0.52026
+    <strong>p_b1</strong>    -0.20905           1     0.18031     0.91424      0.9926    0.015345
+    <strong>p_c1</strong>     0.37804     0.18031           1     0.49084     0.29023    -0.74898
+    <strong>p_g1</strong>    0.044037     0.91424     0.49084           1     0.94535    -0.35026
+    <strong>p_u </strong>    -0.15137      0.9926     0.29023     0.94535           1    -0.07357
+    <strong>p_0 </strong>    -0.52026    0.015345    -0.74898    -0.35026    -0.07357           1
 
 
-Final loss function: 0.421528
+Final loss function: 0.287908
 
 Saved result file: full_system_id_new_data_locked_passive_result.mat
 Saved parameter table: full_system_id_new_data_locked_passive_parameters.csv
@@ -228,12 +136,12 @@ Fixed parameters: p_c1 and all passive-link parameters
 
 
 Stage 1 parameter values:
-p_a        =      31.4554   estimated
-p_b1       =         1500   estimated
+p_a        =      59.0125   estimated
+p_b1       =      3982.27   estimated
 p_c1       =            0   fixed
-p_g1       =      127.879   estimated
-p_u        =      9770.64   estimated
-p_0        =      1.52117   estimated
+p_g1       =      299.978   estimated
+p_u        =      24781.5   estimated
+p_0        =      19.6119   estimated
 p_b2       =    0.0670288   fixed
 p_g2       =      112.027   fixed
 p_c2       =     0.249089   fixed
@@ -242,7 +150,7 @@ v_s2       =          3.5   fixed
 eps_v1     =         0.05   fixed
 eps_v2     =         0.03   fixed
 
-Stage 1 mean identification fit: 67.80 %
+Stage 1 mean identification fit: 71.50 %
 
 ======================================================
 Stage 2: estimating final active parameter set
@@ -271,8 +179,8 @@ Final validation fit, per experiment and output:
     {2×1 double}    {2×1 double}
 
 
-Final mean identification fit: 80.44 %
-Final mean validation fit:     64.36 %
+Final mean identification fit: 83.27 %
+Final mean validation fit:     65.66 %
 
 ======================================================
 Final parameter values and uncertainty
@@ -281,12 +189,12 @@ Final parameter values and uncertainty
       <strong>Parameter</strong>       <strong>Value</strong>      <strong>Fixed</strong>    <strong>Variance</strong>    <strong>StdDev</strong>     <strong>RelativeStdPercent</strong>
     <strong>_____________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>________</strong>    <strong>_______</strong>    <strong>__________________</strong>
 
-    {'p_a'      }      20.452    false      0.1428    0.37788          1.8477      
-    {'p_b1'     }      1458.1    false      24.685     4.9684         0.34074      
-    {'p_c1'     }      249.97    false      5.1495     2.2693         0.90782      
-    {'p_g1'     }         200    false      0.1648    0.40596         0.20298      
-    {'p_u'      }       10322    false      587.09      24.23         0.23473      
-    {'p_0'      }     -26.923    false    0.020332    0.14259         0.52962      
+    {'p_a'      }      25.709    false     0.15403    0.39247          1.5266      
+    {'p_b1'     }      2425.3    false      119.95     10.952         0.45157      
+    {'p_c1'     }         400    false      9.1822     3.0302         0.75756      
+    {'p_g1'     }      317.77    false      1.3867     1.1776         0.37057      
+    {'p_u'      }       16853    false      4922.7     70.162         0.41632      
+    {'p_0'      }       -33.1    false    0.038356    0.19585         0.59169      
     {'p_b2'     }    0.067029    true          NaN        NaN             NaN      
     {'p_g2'     }      112.03    true          NaN        NaN             NaN      
     {'p_c2'     }     0.24909    true          NaN        NaN             NaN      
@@ -297,27 +205,144 @@ Final parameter values and uncertainty
 
 
 Free-parameter covariance matrix:
-    0.1428    0.5275   -0.3194    0.0746    2.3479   -0.0150
-    0.5275   24.6851   -8.2172    1.2808  117.7507    0.2552
-   -0.3194   -8.2172    5.1495   -0.2352  -31.9288   -0.1295
-    0.0746    1.2808   -0.2352    0.1648    6.7641   -0.0204
-    2.3479  117.7507  -31.9288    6.7641  587.0882    1.0975
-   -0.0150    0.2552   -0.1295   -0.0204    1.0975    0.0203
+   1.0e+03 *
+
+    0.0002    0.0000    0.0001    0.0001    0.0011   -0.0000
+    0.0000    0.1200    0.0088    0.0122    0.7581   -0.0003
+    0.0001    0.0088    0.0092    0.0016    0.0877   -0.0003
+    0.0001    0.0122    0.0016    0.0014    0.0795   -0.0001
+    0.0011    0.7581    0.0877    0.0795    4.9227   -0.0030
+   -0.0000   -0.0003   -0.0003   -0.0001   -0.0030    0.0000
+
+
+Free-parameter correlation matrix:
+               <strong>p_a</strong>         <strong>p_b1</strong>         <strong>p_c1</strong>        <strong>p_g1</strong>        <strong>p_u</strong>         <strong>p_0</strong>   
+            <strong>_________</strong>    <strong>_________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>
+
+    <strong>p_a </strong>            1    0.0032172     0.10672     0.14149    0.041347    -0.27988
+    <strong>p_b1</strong>    0.0032172            1     0.26581     0.94552     0.98655    -0.14399
+    <strong>p_c1</strong>      0.10672      0.26581           1     0.43842     0.41232    -0.51433
+    <strong>p_g1</strong>      0.14149      0.94552     0.43842           1     0.96248    -0.41954
+    <strong>p_u </strong>     0.041347      0.98655     0.41232     0.96248           1    -0.21868
+    <strong>p_0 </strong>     -0.27988     -0.14399    -0.51433    -0.41954    -0.21868           1
+
+
+Final loss function: 0.258696
+
+Saved result file: full_system_id_new_data_locked_passive_result.mat
+Saved parameter table: full_system_id_new_data_locked_passive_parameters.csv
+Saved correlation table: full_system_id_new_data_locked_passive_correlations.csv
+
+======================================================
+Starting full-system identification with new data
+Passive-link parameters are locked/fixed
+======================================================
+
+Identification runs: 1, 3, 5, 7, 9 for both PRBS and chirp
+Validation runs:     2, 4, 6, 8, 10 for both PRBS and chirp
+
+Number of identification experiments: 10
+Number of validation experiments:     10
+
+
+======================================================
+Stage 1: estimating active parameters with p_c1 fixed
+Free parameters: p_a, p_b1, p_g1, p_u, p_0
+Fixed parameters: p_c1 and all passive-link parameters
+======================================================
+
+
+Stage 1 parameter values:
+p_a        =      59.0125   estimated
+p_b1       =      3982.27   estimated
+p_c1       =            0   fixed
+p_g1       =      299.978   estimated
+p_u        =      24781.5   estimated
+p_0        =      19.6119   estimated
+p_b2       =    0.0670288   fixed
+p_g2       =      112.027   fixed
+p_c2       =     0.249089   fixed
+p_sdelta2  =     0.183602   fixed
+v_s2       =          3.5   fixed
+eps_v1     =         0.05   fixed
+eps_v2     =         0.03   fixed
+
+Stage 1 mean identification fit: 71.50 %
+
+======================================================
+Stage 2: estimating final active parameter set
+Free parameters: p_a, p_b1, p_c1, p_g1, p_u, p_0
+Fixed parameters: all passive-link parameters and smoothing constants
+======================================================
+
+
+Final identification fit, per experiment and output:
+  Columns 1 through 8
+
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+  Columns 9 through 10
+
+    {2×1 double}    {2×1 double}
+
+
+Final validation fit, per experiment and output:
+  Columns 1 through 8
+
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+  Columns 9 through 10
+
+    {2×1 double}    {2×1 double}
+
+
+Final mean identification fit: 85.20 %
+Final mean validation fit:     68.97 %
+
+======================================================
+Final parameter values and uncertainty
+======================================================
+
+      <strong>Parameter</strong>       <strong>Value</strong>      <strong>Fixed</strong>    <strong>Variance</strong>    <strong>StdDev</strong>     <strong>RelativeStdPercent</strong>
+    <strong>_____________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>________</strong>    <strong>_______</strong>    <strong>__________________</strong>
+
+    {'p_a'      }      64.791    false     0.34213    0.58492          0.90278     
+    {'p_b1'     }      3211.7    false      9.3342     3.0552         0.095128     
+    {'p_c1'     }      635.39    false      4.3401     2.0833          0.32788     
+    {'p_g1'     }      430.52    false     0.27415    0.52359          0.12162     
+    {'p_u'      }       22424    false      206.92     14.385         0.064151     
+    {'p_0'      }     -50.121    false    0.029877    0.17285          0.34487     
+    {'p_b2'     }    0.067029    true          NaN        NaN              NaN     
+    {'p_g2'     }      112.03    true          NaN        NaN              NaN     
+    {'p_c2'     }     0.24909    true          NaN        NaN              NaN     
+    {'p_sdelta2'}      0.1836    true          NaN        NaN              NaN     
+    {'v_s2'     }         3.5    true          NaN        NaN              NaN     
+    {'eps_v1'   }        0.05    true          NaN        NaN              NaN     
+    {'eps_v2'   }        0.03    true          NaN        NaN              NaN     
+
+
+Free-parameter covariance matrix:
+    0.3421    0.6208   -0.8857    0.2071    2.6414   -0.0539
+    0.6208    9.3342   -4.6231    0.8578   43.0913   -0.0737
+   -0.8857   -4.6231    4.3401   -0.5210  -18.8020    0.0545
+    0.2071    0.8578   -0.5210    0.2741    4.0556   -0.0696
+    2.6414   43.0913  -18.8020    4.0556  206.9222   -0.3532
+   -0.0539   -0.0737    0.0545   -0.0696   -0.3532    0.0299
 
 
 Free-parameter correlation matrix:
               <strong>p_a</strong>         <strong>p_b1</strong>        <strong>p_c1</strong>        <strong>p_g1</strong>        <strong>p_u</strong>         <strong>p_0</strong>   
             <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>________</strong>
 
-    <strong>p_a </strong>           1     0.28097    -0.37245     0.48603     0.25644    -0.27811
-    <strong>p_b1</strong>     0.28097           1    -0.72883     0.63504     0.97812     0.36023
-    <strong>p_c1</strong>    -0.37245    -0.72883           1    -0.25529    -0.58069    -0.40022
-    <strong>p_g1</strong>     0.48603     0.63504    -0.25529           1     0.68767    -0.35216
-    <strong>p_u </strong>     0.25644     0.97812    -0.58069     0.68767           1     0.31765
-    <strong>p_0 </strong>    -0.27811     0.36023    -0.40022    -0.35216     0.31765           1
+    <strong>p_a </strong>           1     0.34738    -0.72685      0.6762     0.31392    -0.53327
+    <strong>p_b1</strong>     0.34738           1    -0.72635     0.53622      0.9805    -0.13956
+    <strong>p_c1</strong>    -0.72685    -0.72635           1    -0.47767    -0.62741     0.15122
+    <strong>p_g1</strong>      0.6762     0.53622    -0.47767           1     0.53847    -0.76862
+    <strong>p_u </strong>     0.31392      0.9805    -0.62741     0.53847           1    -0.14204
+    <strong>p_0 </strong>    -0.53327    -0.13956     0.15122    -0.76862    -0.14204           1
 
 
-Final loss function: 0.344521
+Final loss function: 0.216174
 
 Saved result file: full_system_id_new_data_locked_passive_result.mat
 Saved parameter table: full_system_id_new_data_locked_passive_parameters.csv
