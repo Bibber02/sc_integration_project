@@ -1,0 +1,48 @@
+Data file:   D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\..\..\measurement_data\matlab.mat
+Models path: D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\..\models
+Model file:  passive_rod_viscous_model
+Result file: D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_viscous_result_v5_no_helpers.mat
+
+MATLAB will use model file:
+  D:\school\sc_integration_project\system_identification\passive_link\grey_box\models\passive_rod_viscous_model.m
+
+Sample time Ts = 0.010000 s
+
+Data-derived initial guesses:
+  p_b2 = 0.174862
+  p_g2 = 105.937
+
+Number of estimation experiments: 4
+Number of validation experiments: 4
+
+
+======================================================
+Estimating viscous passive-link model
+======================================================
+
+
+Final viscous parameter values:
+p_b2         =    0.0965445
+p_g2         =      112.171
+
+Viscous fit, per estimation experiment:
+    {[36.5418]}    {[70.4314]}    {[79.4015]}    {[84.6140]}
+
+
+Viscous fit, per validation experiment:
+    {[56.8459]}    {[76.6979]}    {[81.8016]}    {[84.8100]}
+
+
+Mean estimation fit: 67.75 %
+Mean validation fit: 75.04 %
+
+Final parameter table:
+    <strong>Parameter</strong>     <strong>Value</strong>      <strong>Fixed</strong>     <strong>Variance</strong>       <strong>StdDev</strong>      <strong>RelativeStdPercent</strong>
+    <strong>_________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>__________</strong>    <strong>__________</strong>    <strong>__________________</strong>
+
+    {'p_b2'}     0.096545    false    2.3991e-08    0.00015489          0.16043     
+    {'p_g2'}       112.17    false    0.00029512      0.017179         0.015315     
+
+
+Saved result file: D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_viscous_result_v5_no_helpers.mat
+Saved parameter table: D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_viscous_parameters_v5_no_helpers.csv

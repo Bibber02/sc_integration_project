@@ -1,0 +1,122 @@
+Data file:   D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\..\..\measurement_data\matlab.mat
+Models path: D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\..\models
+Result file: D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_3step_stribeck_result_v5_no_helpers.mat
+
+MATLAB will use passive_rod_viscous_model from:
+  D:\school\sc_integration_project\system_identification\passive_link\grey_box\models\passive_rod_viscous_model.m
+MATLAB will use passive_rod_coulomb_model from:
+  D:\school\sc_integration_project\system_identification\passive_link\grey_box\models\passive_rod_coulomb_model.m
+MATLAB will use passive_rod_stribeck_report_model from:
+  D:\school\sc_integration_project\system_identification\passive_link\grey_box\models\passive_rod_stribeck_report_model.m
+
+Sample time Ts = 0.010000 s
+
+
+Initial rough guesses from data:
+p_b2 = 0.174862
+p_g2 = 105.936894
+
+
+============================================================
+Stage 1: Viscous + gravity model, full data
+============================================================
+
+Estimated parameters for model: Viscous
+p_b2         =    0.0965445   estimated
+p_g2         =      112.171   estimated
+
+Viscous model mean estimation fit: 67.75 %
+Viscous model mean validation fit: 75.04 %
+Viscous model mean all-data fit: 71.39 %
+
+============================================================
+Stage 2: Coulomb-viscous model, full data
+============================================================
+
+Estimated parameters for model: Coulomb-viscous
+p_b2         =    0.0670909   estimated
+p_g2         =      112.025   estimated
+p_c2         =     0.248612   estimated
+eps_v2       =         0.03   fixed
+
+Coulomb model mean estimation fit: 85.71 %
+Coulomb model mean validation fit: 76.76 %
+Coulomb model mean all-data fit: 79.27 %
+
+============================================================
+Stage 3: Grid search over fixed Stribeck velocity values
+============================================================
+
+Testing fixed v_s2 = 2.5000 rad/s
+  start 1/1 | p_sdelta2: 0.218 | tail val: 95.21 % | full val: 81.35 % | score: 85.51
+
+Testing fixed v_s2 = 2.7500 rad/s
+  start 1/1 | p_sdelta2: 0.2058 | tail val: 95.15 % | full val: 81.61 % | score: 85.67
+
+Testing fixed v_s2 = 3.0000 rad/s
+  start 1/1 | p_sdelta2: 0.1967 | tail val: 95.08 % | full val: 81.82 % | score: 85.80
+
+Testing fixed v_s2 = 3.2500 rad/s
+  start 1/1 | p_sdelta2: 0.1896 | tail val: 95.00 % | full val: 81.97 % | score: 85.88
+
+Testing fixed v_s2 = 3.5000 rad/s
+  start 1/1 | p_sdelta2: 0.1841 | tail val: 94.93 % | full val: 82.08 % | score: 85.94
+
+Best selected report/Stribeck model tail-validation fit: 94.93 %
+
+Estimated parameters for model: Best report Stribeck model, fixed-v_s2 grid
+p_b2         =    0.0670909   fixed
+p_g2         =      112.025   fixed
+p_c2         =     0.248612   fixed
+p_sdelta2    =     0.184081   estimated
+v_s2         =          3.5   fixed
+eps_v2       =         0.03   fixed
+[Warning: Best Stribeck velocity v_s2 is at the upper grid boundary. The optimum may lie above the tested grid. Extend stribeckVsCandidates or treat this model as
+boundary-limited.] 
+[> In <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('passive_link_id_3step_stribeck', 'D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_id_3step_stribeck.m', 1109)" style="font-weight:bold">passive_link_id_3step_stribeck</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_id_3step_stribeck.m',1109,0)">line 1109</a>)] 
+    <strong>v_s2</strong>    <strong>Start</strong>    <strong>p_sdelta2</strong>    <strong>MeanTailEstimationFit</strong>    <strong>MeanTailValidationFit</strong>    <strong>MeanFullValidationFit</strong>    <strong>MeanFullAllDataFit</strong>    <strong>SelectionScore</strong>
+    <strong>____</strong>    <strong>_____</strong>    <strong>_________</strong>    <strong>_____________________</strong>    <strong>_____________________</strong>    <strong>_____________________</strong>    <strong>__________________</strong>    <strong>______________</strong>
+
+     2.5      1       0.21795            94.599                   95.206                   81.348                  85.549              85.505    
+    2.75      1       0.20582            94.528                   95.147                   81.606                  85.627              85.668    
+       3      1       0.19669             94.45                   95.075                   81.821                  85.662              85.797    
+    3.25      1       0.18963            94.374                   95.002                   81.972                   85.63              85.881    
+     3.5      1       0.18408            94.304                   94.933                    82.08                  85.555              85.936    
+
+
+Best report/Stribeck model mean tail validation fit: 94.93 %
+Best report/Stribeck model mean full validation fit: 82.08 %
+Best report/Stribeck model mean full all-data fit: 85.56 %
+
+Parameter uncertainty table:
+                 <strong>Model</strong>                   <strong>Parameter</strong>       <strong>Value</strong>      <strong>Fixed</strong>     <strong>Variance</strong>       <strong>StdDev</strong>      <strong>RelativeStdPercent</strong>    <strong>CI95Lower</strong>    <strong>CI95Upper</strong>
+    <strong>_______________________________</strong>    <strong>_____________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>__________</strong>    <strong>__________</strong>    <strong>__________________</strong>    <strong>_________</strong>    <strong>_________</strong>
+
+    {'Viscous'                    }    {'p_b2'     }    0.096545    false    2.3991e-08    0.00015489          0.16043         0.096241     0.096848 
+    {'Viscous'                    }    {'p_g2'     }      112.17    false    0.00029512      0.017179         0.015315           112.14        112.2 
+    {'Coulomb-viscous'            }    {'p_b2'     }    0.067091    false    1.9487e-08     0.0001396          0.20807         0.066817     0.067365 
+    {'Coulomb-viscous'            }    {'p_g2'     }      112.02    false    0.00011079      0.010526        0.0093959              112       112.05 
+    {'Coulomb-viscous'            }    {'p_c2'     }     0.24861    false    1.5675e-06      0.001252          0.50359          0.24616      0.25107 
+    {'Coulomb-viscous'            }    {'eps_v2'   }        0.03    true            NaN           NaN              NaN              NaN          NaN 
+    {'Best Stribeck fixed-vs grid'}    {'p_b2'     }    0.067091    true            NaN           NaN              NaN              NaN          NaN 
+    {'Best Stribeck fixed-vs grid'}    {'p_g2'     }      112.02    true            NaN           NaN              NaN              NaN          NaN 
+    {'Best Stribeck fixed-vs grid'}    {'p_c2'     }     0.24861    true            NaN           NaN              NaN              NaN          NaN 
+    {'Best Stribeck fixed-vs grid'}    {'p_sdelta2'}     0.18408    false    4.4775e-07    0.00066914           0.3635          0.18277      0.18539 
+    {'Best Stribeck fixed-vs grid'}    {'v_s2'     }         3.5    true            NaN           NaN              NaN              NaN          NaN 
+    {'Best Stribeck fixed-vs grid'}    {'eps_v2'   }        0.03    true            NaN           NaN              NaN              NaN          NaN 
+
+
+Identifiability summary:
+                 <strong>Model</strong>                 <strong>NumParameters</strong>    <strong>NumFreeParameters</strong>    <strong>MaxRelativeStdPercent</strong>    <strong>MaxAbsFreeParameterCorrelation</strong>    <strong>FreeCovarianceConditionNumber</strong>
+    <strong>_______________________________</strong>    <strong>_____________</strong>    <strong>_________________</strong>    <strong>_____________________</strong>    <strong>______________________________</strong>    <strong>_____________________________</strong>
+
+    {'Viscous'                    }          2                  2                   0.16043                      0.78649                              32254          
+    {'Coulomb-viscous'            }          4                  3                   0.50359                      0.87655                         4.4983e+05          
+    {'Best Stribeck fixed-vs grid'}          6                  1                    0.3635                          NaN                                NaN          
+
+
+Best Stribeck free-parameter correlation matrix:
+
+Saved result file: D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_3step_stribeck_result_v5_no_helpers.mat
+Saved uncertainty table: D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_3step_stribeck_parameter_uncertainty_v5_no_helpers.csv
+Saved identifiability table: D:\school\sc_integration_project\system_identification\passive_link\grey_box\stribeck\passive_link_3step_stribeck_identifiability_v5_no_helpers.csv

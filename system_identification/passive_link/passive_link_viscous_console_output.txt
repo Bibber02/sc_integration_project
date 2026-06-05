@@ -1,0 +1,50 @@
+Sample time Ts = 0.010000 s
+
+Number of estimation experiments: 4
+Number of validation experiments: 4
+
+
+======================================================
+Estimating viscous passive-link model
+======================================================
+
+{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('iddata/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m', 1211)" style="font-weight:bold">iddata/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m',1211,0)">line 1211</a>)
+The value of the "FileName" property must be a character vector (specifying a callable MATLAB file, or a p- or MEX-file) or a function handle.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('passive_link_id_viscous', 'D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_id_viscous.m', 236)" style="font-weight:bold">passive_link_id_viscous</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_id_viscous.m',236,0)">line 236</a>)
+model_viscous = nlgreyest(zEst, model0, opt);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+passive_link_id_viscous
+
+======================================================
+Starting passive-link identification: simple viscous-only version
+======================================================
+
+Sample time Ts = 0.010000 s
+
+Data-derived initial guesses:
+  p_b2 = 0.174862
+  p_g2 = 105.937
+
+Number of estimation experiments: 4
+Number of validation experiments: 4
+
+
+======================================================
+Estimating viscous passive-link model
+======================================================
+
+{Error using <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('iddata/nlgreyest', 'C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m', 1211)" style="font-weight:bold">iddata/nlgreyest</a> (<a href="matlab: opentoline('C:\Program Files\MATLAB\R2025b\toolbox\ident\ident\@iddata\iddata.m',1211,0)">line 1211</a>)
+The value of the "FileName" property must be a character vector (specifying a callable MATLAB file, or a p- or MEX-file) or a function handle.
+
+Error in <a href="matlab:matlab.lang.internal.introspective.errorDocCallback('passive_link_id_viscous', 'D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_id_viscous.m', 255)" style="font-weight:bold">passive_link_id_viscous</a> (<a href="matlab: opentoline('D:\school\sc_integration_project\system_identification\passive_link\grey_box\viscous\passive_link_id_viscous.m',255,0)">line 255</a>)
+model_viscous = nlgreyest(zEst, model0, opt);
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+} 
+passive_link_id_viscous_simple_v3
+
+======================================================
+Starting passive-link identification: v3 viscous-only workflow
+======================================================
+
