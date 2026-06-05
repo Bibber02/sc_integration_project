@@ -1,7 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DSCS FPGA interface board: init and I/O conversions
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-h = 0.01;
+h = 0.001;
 % gains and offsets
 daoutoffs = [0.00];                   % output offset
 daoutgain = 1*[-6];                   % output gain

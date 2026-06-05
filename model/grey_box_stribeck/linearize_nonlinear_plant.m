@@ -111,7 +111,7 @@ sys_lin.OutputName = {'theta1','theta2'};
 % 8. Discretize continuous-time linear model
 % ------------------------------------------------------------
 
-Ts = 0.01;   % Sampling period [s]
+Ts = 0.001;   % Sampling period [s]
 
 % Zero-order hold discretization.
 % This assumes the input u is held constant during each sample interval.
@@ -175,7 +175,7 @@ disp('Saved continuous and discrete linearized models to linearized_plant.mat');
 function [xdot, y] = nonlinearPlant(x, u, p)
 %#codegen
 % nonlinearPlant
-%
+
 % Reduced nonlinear plant model for the rotational double pendulum.
 %
 % Inputs:
