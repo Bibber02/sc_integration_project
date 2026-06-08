@@ -38,6 +38,11 @@ lqrSettings = settings;
 linearizedPlantFile = fullfile(projectPaths.lqr, 'lqr_linearized_plant.mat');
 setupResultFile = fullfile(projectPaths.lqr, 'lqr_setup_result.mat');
 simulinkModel = fullfile(projectPaths.lqr, 'rotating-pendulum', 'rotpentemplate.slx');
+simulinkSupportFolder = fullfile(projectPaths.lqr, 'rotating-pendulum');
+
+if isfolder(simulinkSupportFolder) && ~contains(path, simulinkSupportFolder)
+    addpath(simulinkSupportFolder);
+end
 
 hiddenDefaults = struct();
 hiddenDefaults.u0Mode = 'cancel_input_bias';
@@ -48,6 +53,7 @@ hiddenDefaults.filterCutoffHz = 10;
 hiddenDefaults.linearizedPlantFile = linearizedPlantFile;
 hiddenDefaults.setupResultFile = setupResultFile;
 hiddenDefaults.simulinkModel = simulinkModel;
+hiddenDefaults.simulinkSupportFolder = simulinkSupportFolder;
 
 linearizationSettings = settings;
 linearizationSettings.u0Mode = hiddenDefaults.u0Mode;

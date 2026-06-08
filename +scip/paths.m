@@ -7,6 +7,7 @@ p.root = root;
 p.model = fullfile(root, 'model');
 p.controllers = fullfile(root, 'controllers');
 p.lqr = fullfile(p.controllers, 'lqr');
+p.lqrRotatingPendulum = fullfile(p.lqr, 'rotating-pendulum');
 p.kalman = fullfile(p.controllers, 'kalman');
 p.robustV1 = fullfile(p.controllers, 'robust_v1');
 

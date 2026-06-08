@@ -5,6 +5,7 @@ p = scip.paths;
 folders = {
     p.root
     p.lqr
+    p.lqrRotatingPendulum
     p.kalman
     p.hardwareRotatingPendulum
     p.model
