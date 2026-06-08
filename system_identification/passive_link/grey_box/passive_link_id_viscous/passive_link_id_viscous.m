@@ -12,9 +12,6 @@ fprintf('======================================================\n\n');
 % ================================================================
 
 scriptFolder = fileparts(mfilename('fullpath'));
-if isempty(scriptFolder)
-    scriptFolder = pwd;
-end
 
 % Change these if your folders are different.
 dataFolder   = fullfile(scriptFolder, '..', '..', 'measurement_data');
@@ -37,7 +34,7 @@ addpath(modelsFolder);
 % idnlgrey expects the callable function name, not the full .m file path.
 modelFile = 'passive_rod_viscous_model';
 
-resultMatFile   = fullfile(outputFolder, 'passive_link_viscous_result_v5_no_helpers.mat');
+resultMatFile   = fullfile(outputFolder, 'passive_link_viscous_result.mat');
 parameterCsvFile = fullfile(outputFolder, 'passive_link_viscous_parameters_v5_no_helpers.csv');
 consoleLogFile  = fullfile(outputFolder, 'passive_link_viscous_console_output_v5_no_helpers.txt');
 

@@ -5,13 +5,7 @@ while ~isfolder(fullfile(projectRoot, '+scip')) && ~strcmp(projectRoot, filepart
 end
 addpath(fullfile(projectRoot, 'hardware', 'rotating_pendulum'));
 
-if exist('h', 'var') == 1 && isnumeric(h) && isscalar(h) && ~isempty(h)
-    sampleTime = h;
-else
-    sampleTime = 0.01;
-end
-
-cfg = rotpend_hwinit(sampleTime);
+cfg = rotpend_hwinit(0.001);
 h = cfg.h;
 daoutoffs = cfg.daoutoffs;
 daoutgain = cfg.daoutgain;

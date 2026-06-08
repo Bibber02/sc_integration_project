@@ -17,6 +17,9 @@ close all;
 
 %% Settings
 
+scriptFolder = fileparts(mfilename('fullpath'));
+dataFolder = scriptFolder;
+
 amplitudes = [0.16 0.18 0.20 0.22 0.24 0.26 0.28 0.30 0.32 0.34];
 
 %% Plot PRBS measurements
@@ -27,7 +30,7 @@ tiledlayout(10, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 for k = 1:10
 
     ampText = strrep(sprintf('%.2f', amplitudes(k)), '.', 'p');
-    filename = fullfile('prbs', sprintf('fullsystem_prbs_A%s_run%02d.mat', ampText, k));
+    filename = fullfile(dataFolder, 'prbs', sprintf('fullsystem_prbs_A%s_run%02d.mat', ampText, k));
 
     load(filename, 'theta_1', 'theta_2', 'u_ts');
 
@@ -64,7 +67,7 @@ tiledlayout(10, 3, 'TileSpacing', 'compact', 'Padding', 'compact');
 for k = 1:10
 
     ampText = strrep(sprintf('%.2f', amplitudes(k)), '.', 'p');
-    filename = fullfile('chirp', sprintf('fullsystem_chirp_A%s_run%02d.mat', ampText, k));
+    filename = fullfile(dataFolder, 'chirp', sprintf('fullsystem_chirp_A%s_run%02d.mat', ampText, k));
 
     load(filename, 'theta_1', 'theta_2', 'u_ts');
 
