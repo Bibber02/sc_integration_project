@@ -161,6 +161,8 @@ addpath(projectRoot);
 scip.setupPath;
 projectPaths = scip.paths;
 
+% Default angle convention:
+%   all-down: [pi; 0], down-up: [pi; pi], all-up: [0; 0]
 settings.linearization.x0 = [pi; pi; 0; 0];
 settings.linearization.u0Mode = 'cancel_input_bias';
 settings.linearization.Ts = 0.001;

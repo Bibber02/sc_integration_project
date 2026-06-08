@@ -1,7 +1,24 @@
 %% LQR setup
 % Edit this block, then click Run.
+%
+% Angle convention used by this setup:
+%   all-down: [pi; 0]
+%   down-up:  [pi; pi]
+%   all-up:   [0; 0]
 
-x0 = [pi; pi; 0; 0];
+targetEquilibrium = 'down_up';
+
+switch targetEquilibrium
+    case 'all_down'
+        x0 = [pi; 0; 0; 0];
+    case 'down_up'
+        x0 = [pi; pi; 0; 0];
+    case 'all_up'
+        x0 = [0; 0; 0; 0];
+    otherwise
+        error('Unknown targetEquilibrium: %s', targetEquilibrium);
+end
+
 sampleTime = 0.001;
 
 Q_lqr = diag([5 1 0.1 0.1]);
@@ -31,6 +48,7 @@ end
 projectPaths = scip.paths;
 
 settings = struct();
+settings.targetEquilibrium = targetEquilibrium;
 settings.x0 = x0;
 settings.sampleTime = sampleTime;
 settings.Q_lqr = Q_lqr;
@@ -185,6 +203,8 @@ end
 fprintf('\nLQR setup complete.\n');
 fprintf('Linearized plant: %s\n', linearizedPlantFile);
 fprintf('Setup result:     %s\n', setupResultFile);
+fprintf('Target pose:      %s, x0 = [%g; %g; %g; %g]\n', ...
+    targetEquilibrium, x0(1), x0(2), x0(3), x0(4));
 fprintf('Sample time:      %.6g s\n', h);
 fprintf('Command sign:     u_model = %.3g * u_command\n', hardwareCommandToModelInputSign);
 fprintf('Kalman settings:  %s\n', kalmanObserverSettings.source);

@@ -19,6 +19,7 @@ end
 
 if isempty(modelData)
     linSettings = struct();
+    % Angle convention: all-down [pi;0], down-up [pi;pi], all-up [0;0].
     linSettings.x0 = [pi; pi; 0; 0];
     linSettings.sampleTime = settings.runtimeSampleTime;
     linSettings.saveOutput = false;
@@ -81,4 +82,3 @@ else
     runtimeSampleTime = settings.runtimeSampleTime;
 end
 end
-

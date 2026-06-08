@@ -31,7 +31,8 @@ p.passiveLinkStribeck = fullfile(p.passiveLinkGreyBox, 'passive_link_id_3step_st
 p.templateRotatingPendulum = fullfile(root, 'template', 'rotating-pendulum');
 p.hardwareRotatingPendulum = fullfile(root, 'hardware', 'rotating_pendulum');
 
-p.linearizedPlantUprightTs001 = fullfile(p.model, 'linearized_plant_eq_pi_pi_ts_0.001.mat');
+p.linearizedPlantDownUpTs001 = fullfile(p.model, 'linearized_plant_eq_pi_pi_ts_0.001.mat');
+p.linearizedPlantUprightTs001 = p.linearizedPlantDownUpTs001;
 p.fullSystemStribeckResultWithP0 = scip.firstExistingFile({
     fullfile(p.fullSystemGreyBoxStribeck, 'results_with_p0', 'full_system_id_new_data_locked_passive_result.mat')
 });
