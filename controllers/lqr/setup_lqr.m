@@ -7,6 +7,10 @@ sampleTime = 0.001;
 Q_lqr = diag([5 1 0.1 0.1]);
 R_lqr = 5;
 
+% The system-identification scripts use inputSign = -1, so the linear model
+% input is the negative of the command signal sent to the real-time I/O block.
+hardwareCommandToModelInputSign = -1;
+
 openModelAfterSetup = true;
 
 %% Setup logic
@@ -31,6 +35,7 @@ settings.x0 = x0;
 settings.sampleTime = sampleTime;
 settings.Q_lqr = Q_lqr;
 settings.R_lqr = R_lqr;
+settings.hardwareCommandToModelInputSign = hardwareCommandToModelInputSign;
 settings.openModelAfterSetup = openModelAfterSetup;
 
 lqrSettings = settings;
@@ -76,10 +81,23 @@ sys_lin = lin.sys_lin;
 sys_disc = lin.sys_disc;
 Ts = lin.Ts;
 x0 = lin.x0;
+y0 = lin.y0;
 u0 = lin.u0;
 p = lin.p;
 
 run(fullfile(scriptFolder, 'calc_lqr.m'));
+
+if ~isscalar(hardwareCommandToModelInputSign) || hardwareCommandToModelInputSign == 0
+    error('hardwareCommandToModelInputSign must be a nonzero scalar.');
+end
+
+K_lqr_command = -K_lqr / hardwareCommandToModelInputSign;
+u_command0 = u0 / hardwareCommandToModelInputSign;
+
+sys_kalman_disc = sys_disc;
+sys_kalman_disc.B = hardwareCommandToModelInputSign * sys_disc.B;
+sys_kalman_disc.D = hardwareCommandToModelInputSign * sys_disc.D;
+sys_kalman_disc.InputName = {'u_command'};
 
 h = sampleTime;
 hardwareConfig = rotpend_hwinit(h);
@@ -99,8 +117,9 @@ end
 save(setupResultFile, ...
     'settings', 'hiddenDefaults', 'linearizationSettings', 'lin', ...
     'A', 'B', 'C', 'D', 'Ad', 'Bd', 'Cd', 'Dd', ...
-    'sys_lin', 'sys_disc', 'Ts', 'x0', 'u0', 'p', ...
-    'Q_lqr', 'R_lqr', 'K_lqr', 'closedLoopPoles', 'b', 'a', ...
+    'sys_lin', 'sys_disc', 'sys_kalman_disc', 'Ts', 'x0', 'y0', 'u0', 'u_command0', 'p', ...
+    'Q_lqr', 'R_lqr', 'K_lqr', 'K_lqr_command', 'closedLoopPoles', 'b', 'a', ...
+    'hardwareCommandToModelInputSign', ...
     'Q_kalman', 'R_kalman', 'P0_kalman', 'x0_kalman', 'kalmanObserverSettings', ...
     'h', 'daoutoffs', 'daoutgain', 'adinoffs', 'adingain');
 
@@ -116,14 +135,19 @@ workspaceVars = {
     'Dd'
     'sys_lin'
     'sys_disc'
+    'sys_kalman_disc'
     'Ts'
     'x0'
+    'y0'
     'u0'
+    'u_command0'
     'p'
     'Q_lqr'
     'R_lqr'
     'K_lqr'
+    'K_lqr_command'
     'closedLoopPoles'
+    'hardwareCommandToModelInputSign'
     'b'
     'a'
     'Q_kalman'
@@ -162,6 +186,7 @@ fprintf('\nLQR setup complete.\n');
 fprintf('Linearized plant: %s\n', linearizedPlantFile);
 fprintf('Setup result:     %s\n', setupResultFile);
 fprintf('Sample time:      %.6g s\n', h);
+fprintf('Command sign:     u_model = %.3g * u_command\n', hardwareCommandToModelInputSign);
 fprintf('Kalman settings:  %s\n', kalmanObserverSettings.source);
 
 function [Q_kalman, R_kalman, P0_kalman, x0_kalman, settings] = loadKalmanObserverSettings(projectPaths, sampleTime)
@@ -242,11 +267,27 @@ if blockHandle == -1
 end
 
 set_param(kalmanBlock, ...
-    'ModelSourceVariable', 'sys_disc', ...
+    'ModelSourceVariable', 'sys_kalman_disc', ...
     'Q', 'Q_kalman', ...
     'R', 'R_kalman', ...
     'P0', 'P0_kalman', ...
     'X0', 'x0_kalman');
 
-fprintf('Configured in-memory Kalman Filter block to use Q_kalman/R_kalman.\n');
+gainBlock = [modelName, '/Gain'];
+if getSimulinkBlockHandle(gainBlock) ~= -1
+    set_param(gainBlock, 'Gain', 'K_lqr_command');
+else
+    warning('LQR Gain block was not found in model %s.', modelName);
+end
+
+offsetBlock = [modelName, '/Constant'];
+if getSimulinkBlockHandle(offsetBlock) ~= -1
+    set_param(offsetBlock, 'Value', 'y0');
+else
+    warning('Output-offset Constant block was not found in model %s.', modelName);
+end
+
+fprintf('Configured in-memory Kalman Filter block to use Q_kalman/R_kalman and sys_kalman_disc.\n');
+fprintf('Configured in-memory LQR Gain block to use K_lqr_command.\n');
+fprintf('Configured in-memory output offset block to subtract y0.\n');
 end

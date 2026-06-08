@@ -26,7 +26,10 @@ Cd = sys_disc.C;
 Dd = sys_disc.D;
 Ts = sys_disc.Ts;
 
-% Discrete-time LQR gain
+% Discrete-time LQR gain for model coordinates:
+%   u_model_dev = -K_lqr * x_dev.
+% The real hardware command may need an extra sign conversion; setup_lqr.m
+% computes K_lqr_command for the Simulink Gain block.
 K_lqr = dlqr(Ad, Bd, Q_lqr, R_lqr);
 closedLoopPoles = eig(Ad - Bd*K_lqr);
 
