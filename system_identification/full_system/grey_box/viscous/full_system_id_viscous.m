@@ -29,12 +29,16 @@ close all;
 % ================================================================
 
 scriptFolder = fileparts(mfilename('fullpath'));
-if isempty(scriptFolder)
-    scriptFolder = pwd;
+projectRoot = scriptFolder;
+while ~isfolder(fullfile(projectRoot, '+scip')) && ~strcmp(projectRoot, fileparts(projectRoot))
+    projectRoot = fileparts(projectRoot);
 end
+addpath(projectRoot);
+scip.setupPath;
+projectPaths = scip.paths;
 
 % Change these paths if your folder structure is different.
-dataFolder   = fullfile(scriptFolder, '..\..\measurement_data');
+dataFolder   = projectPaths.fullSystemMeasurementData;
 prbsFolder   = fullfile(dataFolder, 'prbs');
 chirpFolder  = fullfile(dataFolder, 'chirp');
 modelsFolder = scriptFolder;
@@ -75,7 +79,7 @@ figurePosition = [80 80 1150 720];
 % The viscous full-system model only needs p_b2 and p_g2.
 % Keep the manual values as a fallback only.
 loadPassiveParametersFromMat = true;
-passiveResultMatFile = fullfile(scriptFolder, '..\..\..\passive_link\grey_box\passive_link_id_viscous\passive_link_viscous_result.mat');
+passiveResultMatFile = projectPaths.passiveLinkViscousResult;
 
 % Manual fallback values. These are only used when
 % loadPassiveParametersFromMat = false.

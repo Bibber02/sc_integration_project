@@ -1,8 +1,21 @@
 % ------------------------------------------------------------------------
 % Structured H-infinity (closed-loop shaping) design
 
+scriptFolder = fileparts(mfilename('fullpath'));
+projectRoot = scriptFolder;
+while ~isfolder(fullfile(projectRoot, '+scip')) && ~strcmp(projectRoot, fileparts(projectRoot))
+    projectRoot = fileparts(projectRoot);
+end
+addpath(projectRoot);
+scip.setupPath;
+projectPaths = scip.paths;
+
 %% 1. Load the linearized plant ------------------------------------------
-load('linearized_plant.mat','sys_lin');     % -> sys_lin, A,B,C,D, etc.
+plantFile = projectPaths.linearizedPlantUprightTs001;
+if ~isfile(plantFile)
+    error('Linearized plant file not found: %s', plantFile);
+end
+load(plantFile, 'sys_lin');     % -> sys_lin, A,B,C,D, etc.
 
 G = sys_lin;
 G.InputName  = 'u';
@@ -146,6 +159,7 @@ step(T_do2y(:,1), 5); grid on
 title('Linear response of [\theta_1;\theta_2] to a step disturbance on \theta_1');
 
 %% 10. Save the design ---------------------------------------------------
-save('hinf_pid_controller.mat','Kc','C1t','C2t','So','To','KSo','Lo', ...
+controllerFile = fullfile(scriptFolder, 'hinf_pid_controller.mat');
+save(controllerFile,'Kc','C1t','C2t','So','To','KSo','Lo', ...
      'WS','WKS','fSoft','gHard','G');
-fprintf('Saved controller and analysis to hinf_pid_controller.mat\n');
+fprintf('Saved controller and analysis to %s\n', controllerFile);

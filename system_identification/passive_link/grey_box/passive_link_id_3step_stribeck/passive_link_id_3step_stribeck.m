@@ -12,9 +12,6 @@ fprintf('======================================================\n\n');
 % ================================================================
 
 scriptFolder = fileparts(mfilename('fullpath'));
-if isempty(scriptFolder)
-    scriptFolder = pwd;
-end
 
 % Change these if your folders are different.
 dataFolder   = fullfile(scriptFolder, '..', '..', 'measurement_data');
@@ -39,7 +36,7 @@ viscousModelFile  = 'passive_rod_viscous_model';
 coulombModelFile  = 'passive_rod_coulomb_model';
 stribeckModelFile = 'passive_rod_stribeck_report_model';
 
-resultMatFile = fullfile(outputFolder, 'passive_link_3step_stribeck_result_v5_no_helpers.mat');
+resultMatFile = fullfile(outputFolder, 'passive_link_3step_stribeck_result.mat');
 uncertaintyCsvFile = fullfile(outputFolder, 'passive_link_3step_stribeck_parameter_uncertainty_v5_no_helpers.csv');
 identifiabilityCsvFile = fullfile(outputFolder, 'passive_link_3step_stribeck_identifiability_v5_no_helpers.csv');
 consoleLogFile = fullfile(outputFolder, 'passive_link_3step_stribeck_console_output_v5_no_helpers.txt');

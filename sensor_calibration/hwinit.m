@@ -1,21 +1,19 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% DSCS FPGA interface board: init and I/O conversions
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+scriptFolder = fileparts(mfilename('fullpath'));
+projectRoot = scriptFolder;
+while ~isfolder(fullfile(projectRoot, '+scip')) && ~strcmp(projectRoot, fileparts(projectRoot))
+    projectRoot = fileparts(projectRoot);
+end
+addpath(fullfile(projectRoot, 'hardware', 'rotating_pendulum'));
 
-% gains and offsets
-daoutoffs = [0.00];                   % output offset
-daoutgain = 1*[-6];                   % output gain
+if exist('h', 'var') == 1 && isnumeric(h) && isscalar(h) && ~isempty(h)
+    sampleTime = h;
+else
+    sampleTime = 0.01;
+end
 
-a_theta_1 = 1.200374077783257;
-b_theta_1 = 1.070535559513546;
-
-a_theta_2 = 1.222725978474668;
-b_theta_2 = 1.190099998448171;
-
-% Sensor calibration:
-adinoffs = -[b_theta_1 b_theta_2];
-adingain = [a_theta_1 a_theta_2];
-
-adinoffs = [adinoffs 0 0 0 0 0];    % input offset
-adingain = [adingain 1 1 1 1 1];     % input gain (to radians)
-
+cfg = rotpend_hwinit(sampleTime);
+h = cfg.h;
+daoutoffs = cfg.daoutoffs;
+daoutgain = cfg.daoutgain;
+adinoffs = cfg.adinoffs;
+adingain = cfg.adingain;

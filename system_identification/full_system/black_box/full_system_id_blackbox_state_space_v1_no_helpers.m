@@ -29,12 +29,16 @@ close all;
 % ================================================================
 
 scriptFolder = fileparts(mfilename('fullpath'));
-if isempty(scriptFolder)
-    scriptFolder = pwd;
+projectRoot = scriptFolder;
+while ~isfolder(fullfile(projectRoot, '+scip')) && ~strcmp(projectRoot, fileparts(projectRoot))
+    projectRoot = fileparts(projectRoot);
 end
+addpath(projectRoot);
+scip.setupPath;
+projectPaths = scip.paths;
 
 % Folder layout. Change these paths if your project structure is different.
-dataFolder   = fullfile(scriptFolder, '\..\measurement_data');
+dataFolder   = projectPaths.fullSystemMeasurementData;
 prbsFolder   = fullfile(dataFolder, 'prbs');
 chirpFolder  = fullfile(dataFolder, 'chirp');
 outputFolder = scriptFolder;

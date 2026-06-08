@@ -14,11 +14,14 @@ close all;
 %   u_prbs_01, ..., u_prbs_05
 %   u_chirp_01, ..., u_chirp_05
 %
-% Also saved to:
+% Also saved next to this script:
 %   generated_id_inputs.mat
 % ================================================================
 
 %% Settings
+scriptFolder = fileparts(mfilename('fullpath'));
+generatedInputFile = fullfile(scriptFolder, 'generated_id_inputs.mat');
+
 Ts = 0.01;                 % sample time [s], same as sensors
 restBefore = 4.0;          % seconds
 excitationTime = 20.0;     % seconds
@@ -136,15 +139,28 @@ end
 sgtitle('Generated ID input signals');
 
 %% Save all generated signals
-save('generated_id_inputs.mat', ...
-    'u_prbs_01', 'u_prbs_02', 'u_prbs_03', 'u_prbs_04', 'u_prbs_05', ...
-    'u_chirp_01', 'u_chirp_02', 'u_chirp_03', 'u_chirp_04', 'u_chirp_05', ...
-    'Ts', 'restBefore', 'excitationTime', 'restAfter', ...
-    'prbsAmplitudes', 'chirpAmplitudes', 'prbsSwitchTime', ...
-    'chirpF0', 'chirpF1');
+metadataNames = {
+    'Ts'
+    'restBefore'
+    'excitationTime'
+    'restAfter'
+    'prbsAmplitudes'
+    'chirpAmplitudes'
+    'prbsSwitchTime'
+    'chirpF0'
+    'chirpF1'
+};
+
+saveVars = [
+    cellstr(prbsNames(:))
+    cellstr(chirpNames(:))
+    metadataNames
+];
+
+save(generatedInputFile, saveVars{:});
 
 fprintf('\nGenerated variables:\n');
 disp(prbsNames);
 disp(chirpNames);
 
-fprintf('\nSaved to generated_id_inputs.mat\n');
+fprintf('\nSaved to %s\n', generatedInputFile);
