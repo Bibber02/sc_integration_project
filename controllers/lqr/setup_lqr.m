@@ -58,7 +58,6 @@ f0 = lin.f0;
 Q_ekf = ekfTuning.Q_ekf;
 R_ekf = ekfTuning.R_ekf;
 P0_ekf = ekfTuning.P0_ekf;
-x0_ekf = ekfTuning.x0_ekf;
 Ts_ekf = ekfTuning.Ts_ekf;
 
 if abs(Ts - Ts_ekf) > 100 * eps(max(1, Ts_ekf))
@@ -67,6 +66,11 @@ if abs(Ts - Ts_ekf) > 100 * eps(max(1, Ts_ekf))
         'Use sampleTime = Ts_ekf or retune the EKF.'], Ts, Ts_ekf);
 end
 
+% The EKF estimates absolute states. Subtract x0_lqr after the EKF output
+% before feeding the state into the LQR gain.
+x0_ekf = x0;
+x0_lqr = x0;
+
 % Compatibility aliases for old block/workspace names.
 Q_kalman = Q_ekf;
 R_kalman = R_ekf;
@@ -74,8 +78,10 @@ P0_kalman = P0_ekf;
 x0_kalman = x0_ekf;
 
 % Extra input passed to rotpendulumEkfStateTransition:
-% [u_dev; Ts; u0; x0; p]
-ekfInputParameters = [Ts; u0; x0; p];
+% [u_dev; Ts; u0; x_offset; p]
+% x_offset is zero here because the EKF state itself is absolute.
+ekfStateOffset = zeros(4, 1);
+ekfInputParameters = [Ts; u0; ekfStateOffset; p];
 
 % EKF block dialog values. The model folder was added to the path above, so
 % Simulink can resolve these functions by name.
@@ -83,14 +89,16 @@ ekfStateTransitionFcn = 'rotpendulumEkfStateTransition';
 ekfMeasurementFcn = 'rotpendulumEkfMeasurement';
 ekfBlockSettings = struct( ...
     'StateTransitionFcn', ekfStateTransitionFcn, ...
-    'StateTransitionHasExtraInput', true, ...
+    'HasStateTransitionFcnExtraArgument', '1', ...
     'StateTransitionExtraInputSignal', '[u_dev; ekfInputParameters]', ...
     'MeasurementFcn', ekfMeasurementFcn, ...
+    'MeasurementInputSignal', 'absolute measured [theta1; theta2]', ...
     'ProcessNoise', 'Q_ekf', ...
     'MeasurementNoise', 'R_ekf', ...
     'InitialState', 'x0_ekf', ...
     'InitialStateCovariance', 'P0_ekf', ...
-    'SampleTime', 'Ts');
+    'SampleTime', 'Ts', ...
+    'PostEkfLqrInput', 'x_ekf - x0_lqr');
 
 fprintf('\nLQR/EKF setup complete.\n');
 fprintf('Sample time:       %.6g s\n', Ts);
