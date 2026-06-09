@@ -43,8 +43,12 @@ R_ekf = cov(noise, 1);
 R_ekf = (R_ekf + R_ekf.') / 2;
 
 %% Q parameterization and EKF functions
-stateTransitionFcn = @(x, u) rk4Transition(x, u, p, Ts);
-measurementFcn = @measureAngles;
+absoluteStateOffset = zeros(4, 1);
+absoluteInputOffset = 0;
+ekfInputTail = [Ts; absoluteInputOffset; absoluteStateOffset; p];
+stateTransitionFcn = @(x, u) rotpendulumEkfStateTransition(x, ...
+    [u; ekfInputTail]);
+measurementFcn = @rotpendulumEkfMeasurement;
 costFcn = @(logQdiag) ekfValidationCost(logQdiag, experiments, ...
     stateTransitionFcn, measurementFcn, R_ekf, P0, ...
     logQLower, logQUpper, outOfRangePenaltyWeight);
@@ -96,6 +100,10 @@ best_q_theta2 = bestQdiag(2);
 best_q_omega1 = bestQdiag(3);
 best_q_omega2 = bestQdiag(4);
 Q_ekf = diag(bestQdiag);
+P0_ekf = P0;
+x0_ekf = zeros(4, 1);
+Ts_ekf = Ts;
+ekfResultFile = fullfile(scriptFolder, 'ekf_tuning_result.mat');
 
 fprintf('\nBest EKF process-noise values:\n');
 fprintf('  q_theta1 = %.12g\n', best_q_theta1);
@@ -109,6 +117,14 @@ disp(R_ekf);
 fprintf('Final average validation cost: %.12g\n', finalValidationCost);
 fprintf('\nMulti-start summary:\n');
 disp(sortrows(startResults, 'FinalCost'));
+
+save(ekfResultFile, ...
+    'Q_ekf', 'R_ekf', 'P0_ekf', 'x0_ekf', 'Ts_ekf', ...
+    'bestQdiag', 'bestLogQdiag', 'finalValidationCost', ...
+    'startResults', ...
+    'best_q_theta1', 'best_q_theta2', ...
+    'best_q_omega1', 'best_q_omega2');
+fprintf('Saved EKF tuning result: %s\n', ekfResultFile);
 
 %% Final EKF run and plots
 finalResults = cell(size(experiments));
@@ -197,18 +213,6 @@ end
 
 data = double(squeeze(data));
 data = data(:);
-end
-
-function xNext = rk4Transition(x, u, p, Ts)
-k1 = nonlinearPlant(x, u, p);
-k2 = nonlinearPlant(x + 0.5 * Ts * k1, u, p);
-k3 = nonlinearPlant(x + 0.5 * Ts * k2, u, p);
-k4 = nonlinearPlant(x + Ts * k3, u, p);
-xNext = x + (Ts / 6) * (k1 + 2 * k2 + 2 * k3 + k4);
-end
-
-function y = measureAngles(x)
-y = x(1:2);
 end
 
 function cost = ekfValidationCost(logQdiag, experiments, stateTransitionFcn, ...

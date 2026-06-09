@@ -1,7 +1,7 @@
 %% Single-file LQR setup
 % Edit this block, then run this file from anywhere.
 
-sampleTime = 0.001;
+sampleTime = 0.01;
 
 % Angle convention:
 %   all-down: [pi; 0]
@@ -31,19 +31,19 @@ adingain = [adingain 1 1 1 1 1];
 sensorChannels = [6 7];
 hardwareInitEnabled = true;
 
-% Kalman filter settings. These can be replaced by tuned values later.
-Q_kalman = diag([0.1 0.1 1 0.1]);
-R_kalman = diag([7.3339511547e-6 1.13475782135e-5]);
-P0_kalman = 10 * eye(4);
-x0_kalman = zeros(4, 1);
-
 openModelAfterSetup = true;
 
 %% Setup logic
 
 scriptFolder = fileparts(mfilename('fullpath'));
 projectRoot = fileparts(fileparts(scriptFolder));
+modelFolder = fullfile(projectRoot, 'model');
 templateSupportFolder = fullfile(projectRoot, 'template', 'rotating-pendulum');
+ekfResultCandidates = {
+    fullfile(projectRoot, 'kalman_filter_tuning', 'ekf_tuning_result.mat')
+    fullfile(projectRoot, 'kalman_filter_tuning', 'EKF_tune_results.mat')
+};
+ekfResultFile = selectEkfResultFile(ekfResultCandidates);
 parameterResultFile = fullfile(projectRoot, ...
     'system_identification', 'full_system', 'grey_box', 'stribeck', ...
     'results_with_p0', 'full_system_id_new_data_locked_passive_result.mat');
@@ -53,6 +53,26 @@ simulinkModel = fullfile(scriptFolder, 'rotating-pendulum', 'rotpentemplate.slx'
 
 cd(projectRoot);
 addpath(scriptFolder, '-begin');
+addpath(modelFolder, '-begin');
+
+ekfTuning = loadEkfTuningResult(ekfResultFile);
+Q_ekf = ekfTuning.Q_ekf;
+R_ekf = ekfTuning.R_ekf;
+P0_ekf = ekfTuning.P0_ekf;
+x0_ekf = ekfTuning.x0_ekf;
+Ts_ekf = ekfTuning.Ts_ekf;
+
+if abs(sampleTime - Ts_ekf) > 100 * eps(max(1, Ts_ekf))
+    error('setup_lqr:EkfSampleTimeMismatch', ...
+        ['The LQR/EKF sample time is %.12g s, but the tuned EKF sample time is %.12g s. ', ...
+        'Run with sampleTime = Ts_ekf or retune the EKF at the desired sample time.'], ...
+        sampleTime, Ts_ekf);
+end
+
+Q_kalman = Q_ekf;
+R_kalman = R_ekf;
+P0_kalman = P0_ekf;
+x0_kalman = x0_ekf;
 
 settings = struct();
 settings.sampleTime = sampleTime;
@@ -69,6 +89,7 @@ settings.parameterResultFile = parameterResultFile;
 settings.linearizedPlantFile = linearizedPlantFile;
 settings.setupResultFile = setupResultFile;
 settings.simulinkModel = simulinkModel;
+settings.ekfResultFile = ekfResultFile;
 settings.hardwareInitEnabled = hardwareInitEnabled;
 
 lqrSettings = settings;
@@ -93,6 +114,7 @@ Cd = sys_disc.C;
 Dd = sys_disc.D;
 Ts = sys_disc.Ts;
 h = Ts;
+ekfInputParameters = [Ts; u0; x0; p];
 runHardwareInit = false; %#ok<NASGU>
 
 run(fullfile(scriptFolder, 'calc_lqr.m'));
@@ -126,6 +148,8 @@ save(setupResultFile, ...
     'A', 'B', 'C', 'D', 'Ad', 'Bd', 'Cd', 'Dd', ...
     'sys_lin', 'sys_disc', 'Ts', 'x0', 'y0', 'u0', 'p', ...
     'Q_lqr', 'R_lqr', 'K_lqr', 'closedLoopPoles', 'b', 'a', ...
+    'Q_ekf', 'R_ekf', 'P0_ekf', 'x0_ekf', 'Ts_ekf', ...
+    'ekfInputParameters', 'ekfResultFile', ...
     'Q_kalman', 'R_kalman', 'P0_kalman', 'x0_kalman', ...
     'h', 'daoutoffs', 'daoutgain', 'adinoffs', 'adingain', ...
     'sensorChannels', 'hardwareInitEnabled');
@@ -151,6 +175,13 @@ workspaceVars = {
     'y0'
     'u0'
     'p'
+    'Q_ekf'
+    'R_ekf'
+    'P0_ekf'
+    'x0_ekf'
+    'Ts_ekf'
+    'ekfInputParameters'
+    'ekfResultFile'
     'Q_lqr'
     'R_lqr'
     'K_lqr'
@@ -195,6 +226,92 @@ fprintf('Initial state x0:  [%g; %g; %g; %g]\n', x0(1), x0(2), x0(3), x0(4));
 fprintf('Linearized plant:  %s\n', linearizedPlantFile);
 fprintf('Setup result:      %s\n', setupResultFile);
 fprintf('Simulink model:    %s\n', simulinkModel);
+
+function ekfResultFile = selectEkfResultFile(ekfResultCandidates)
+ekfResultFile = ekfResultCandidates{1};
+for i = 1:numel(ekfResultCandidates)
+    if isfile(ekfResultCandidates{i})
+        ekfResultFile = ekfResultCandidates{i};
+        return;
+    end
+end
+end
+
+function ekfTuning = loadEkfTuningResult(ekfResultFile)
+if ~isfile(ekfResultFile)
+    error('setup_lqr:MissingEkfTuningResult', ...
+        ['Could not find the EKF tuning result file:\n  %s\n', ...
+        'Run kalman_filter_tuning/EKF_tune.m first.'], ekfResultFile);
+end
+
+namesToLoad = variablesToLoad(ekfResultFile);
+ekfTuning = load(ekfResultFile, namesToLoad{:});
+ekfTuning = normalizeEkfTuningResult(ekfTuning, ekfResultFile);
+
+ekfTuning.Q_ekf = double(ekfTuning.Q_ekf);
+ekfTuning.R_ekf = double(ekfTuning.R_ekf);
+ekfTuning.P0_ekf = double(ekfTuning.P0_ekf);
+ekfTuning.x0_ekf = double(ekfTuning.x0_ekf(:));
+ekfTuning.Ts_ekf = double(ekfTuning.Ts_ekf);
+
+if ~isequal(size(ekfTuning.Q_ekf), [4 4])
+    error('setup_lqr:InvalidEkfQ', ...
+        'Q_ekf must be a 4-by-4 matrix in %s.', ekfResultFile);
+end
+if ~isequal(size(ekfTuning.R_ekf), [2 2])
+    error('setup_lqr:InvalidEkfR', ...
+        'R_ekf must be a 2-by-2 matrix in %s.', ekfResultFile);
+end
+if ~isequal(size(ekfTuning.P0_ekf), [4 4])
+    error('setup_lqr:InvalidEkfP0', ...
+        'P0_ekf must be a 4-by-4 matrix in %s.', ekfResultFile);
+end
+if numel(ekfTuning.x0_ekf) ~= 4
+    error('setup_lqr:InvalidEkfX0', ...
+        'x0_ekf must contain four states in %s.', ekfResultFile);
+end
+if ~isscalar(ekfTuning.Ts_ekf) || ~isfinite(ekfTuning.Ts_ekf) || ekfTuning.Ts_ekf <= 0
+    error('setup_lqr:InvalidEkfTs', ...
+        'Ts_ekf must be a positive scalar in %s.', ekfResultFile);
+end
+end
+
+function names = variablesToLoad(ekfResultFile)
+fileInfo = whos('-file', ekfResultFile);
+fileNames = {fileInfo.name};
+candidateNames = {'Q_ekf', 'R_ekf', 'P0_ekf', 'P0', 'x0_ekf', 'Ts_ekf', 'Ts'};
+names = candidateNames(ismember(candidateNames, fileNames));
+end
+
+function ekfTuning = normalizeEkfTuningResult(ekfTuning, ekfResultFile)
+if ~isfield(ekfTuning, 'Q_ekf')
+    error('setup_lqr:InvalidEkfTuningResult', ...
+        'EKF tuning result %s is missing variable Q_ekf.', ekfResultFile);
+end
+if ~isfield(ekfTuning, 'R_ekf')
+    error('setup_lqr:InvalidEkfTuningResult', ...
+        'EKF tuning result %s is missing variable R_ekf.', ekfResultFile);
+end
+if ~isfield(ekfTuning, 'P0_ekf')
+    if isfield(ekfTuning, 'P0')
+        ekfTuning.P0_ekf = ekfTuning.P0;
+    else
+        ekfTuning.P0_ekf = 10 * eye(4);
+    end
+end
+if ~isfield(ekfTuning, 'x0_ekf')
+    ekfTuning.x0_ekf = zeros(4, 1);
+end
+if ~isfield(ekfTuning, 'Ts_ekf')
+    if isfield(ekfTuning, 'Ts')
+        ekfTuning.Ts_ekf = ekfTuning.Ts;
+    else
+        error('setup_lqr:InvalidEkfTuningResult', ...
+            'EKF tuning result %s is missing variable Ts_ekf or Ts.', ...
+            ekfResultFile);
+    end
+end
+end
 
 function p = loadPlantParameters(parameterResultFile, l1, g)
 S = load(parameterResultFile, 'resultTable');
@@ -337,17 +454,93 @@ function configureSimulinkModel(modelName, sensorChannels)
 set_param([modelName '/Gain'], 'Gain', '-K_lqr');
 set_param([modelName '/Constant'], 'Value', 'y0');
 
-set_param([modelName '/Kalman Filter'], ...
-    'ModelSourceVariable', 'sys_disc', ...
-    'Q', 'Q_kalman', ...
-    'R', 'R_kalman', ...
-    'P0', 'P0_kalman', ...
-    'X0', 'x0_kalman');
+configureExtendedKalmanFilter(modelName);
 
 set_param([modelName '/Subsystem/RT input'], ...
     'Ts', 'h', ...
     'channels', mat2str(sensorChannels), ...
     'MaskInitialization', hardwareMaskInitialization());
+end
+
+function configureExtendedKalmanFilter(modelName)
+deleteBlockIfPresent([modelName '/Kalman Filter']);
+deleteBlockIfPresent([modelName '/Extended Kalman Filter']);
+deleteBlockIfPresent([modelName '/EKF Input Vector']);
+deleteBlockIfPresent([modelName '/EKF Parameters']);
+
+load_system('ctrlSharedLib');
+
+ekfBlock = [modelName '/Extended Kalman Filter'];
+add_block('ctrlSharedLib/Extended Kalman Filter', ekfBlock, ...
+    'Position', [535 204 625 266]);
+
+set_param(ekfBlock, ...
+    'StateTransitionFcn', 'rotpendulumEkfStateTransition', ...
+    'HasStateTransitionJacobianFcn', 'off', ...
+    'HasAdditiveProcessNoise', 'Additive', ...
+    'ProcessNoise', 'Q_ekf', ...
+    'HasTimeVaryingProcessNoise', 'off', ...
+    'HasStateTransitionFcnExtraArgument', '1', ...
+    'InitialState', 'x0_ekf', ...
+    'InitialStateCovariance', 'P0_ekf', ...
+    'MeasurementFcn1', 'rotpendulumEkfMeasurement', ...
+    'HasMeasurementJacobianFcn1', 'off', ...
+    'HasAdditiveMeasurementNoise1', 'Additive', ...
+    'MeasurementNoise1', 'R_ekf', ...
+    'HasTimeVaryingMeasurementNoise1', 'off', ...
+    'HasMeasurementFcnExtraArgument1', '0', ...
+    'EnableMultirate', 'off', ...
+    'UseCurrentEstimator', 'on', ...
+    'OutputStateCovariance', 'off', ...
+    'SampleTime', 'Ts');
+
+paramBlock = [modelName '/EKF Parameters'];
+add_block('simulink/Sources/Constant', paramBlock, ...
+    'Position', [330 340 455 370], ...
+    'Value', 'ekfInputParameters');
+
+muxBlock = [modelName '/EKF Input Vector'];
+add_block('simulink/Signal Routing/Mux', muxBlock, ...
+    'Position', [485 315 490 365], ...
+    'Inputs', '2');
+
+connectLine(modelName, 'Saturation/1', 'EKF Input Vector/1');
+connectLine(modelName, 'EKF Parameters/1', 'EKF Input Vector/2');
+connectLine(modelName, 'Sum1/1', 'Extended Kalman Filter/1');
+connectLine(modelName, 'EKF Input Vector/1', 'Extended Kalman Filter/2');
+connectLine(modelName, 'Extended Kalman Filter/1', 'Gain/1');
+connectLine(modelName, 'Extended Kalman Filter/1', 'Demux1/1');
+end
+
+function deleteBlockIfPresent(blockPath)
+if blockExists(blockPath)
+    delete_block(blockPath);
+end
+end
+
+function tf = blockExists(blockPath)
+tf = getSimulinkBlockHandle(blockPath) ~= -1;
+end
+
+function connectLine(modelName, sourcePort, destinationPort)
+deleteLineAtDestination(modelName, destinationPort);
+add_line(modelName, sourcePort, destinationPort, 'autorouting', 'on');
+end
+
+function deleteLineAtDestination(modelName, destinationPort)
+[blockName, portNumber] = splitBlockPort(destinationPort);
+blockPath = [modelName '/' blockName];
+portHandles = get_param(blockPath, 'PortHandles');
+lineHandle = get_param(portHandles.Inport(portNumber), 'Line');
+if lineHandle ~= -1
+    delete_line(lineHandle);
+end
+end
+
+function [blockName, portNumber] = splitBlockPort(blockPort)
+slashIndex = find(blockPort == '/', 1, 'last');
+blockName = blockPort(1:slashIndex - 1);
+portNumber = str2double(blockPort(slashIndex + 1:end));
 end
 
 function code = hardwareMaskInitialization()
