@@ -15,7 +15,7 @@ Q_lqr = diag([
     0.1       % theta2_dot
 ]);
 
-R_lqr = 5;
+R_lqr = 1;
 
 % Discrete-time LQR gain
 K_lqr = dlqr(Ad, Bd, Q_lqr, R_lqr);
