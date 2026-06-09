@@ -11,8 +11,8 @@ sampleTime = 0.01;
 %   all-up:   [0; 0]
 x0 = [pi; pi; 0; 0];
 
-Q_lqr = diag([5 1 0.1 0.1]);
-R_lqr = 5;
+Q_lqr = diag([5 3 0.1 0.01]);
+R_lqr = 1;
 
 %% Paths
 scriptFolder = fileparts(mfilename('fullpath'));
