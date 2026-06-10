@@ -1,0 +1,358 @@
+clear;
+clc;
+close all;
+
+%% Configuration
+scriptFolder = fileparts(mfilename('fullpath'));
+projectRoot = fileparts(scriptFolder);
+addpath(fullfile(projectRoot, 'model'));
+
+Ts = 0.01;
+
+validationRuns = [2 4 6 8 10];
+amplitudes = [0.16 0.18 0.20 0.22 0.24 0.26 0.28 0.30 0.32 0.34];
+inputSign = -1;
+
+plotRuns = validationRuns;
+
+initialQdiag = [1e-6 1e-6 1e-3 1e-3];
+
+qLogLower = [-10 -10 -8 -8];
+qLogUpper = [ -2  -2  1  1];
+
+sigmaThetaDot0 = 0.02;
+
+nRandomStarts = 5;
+randomSeed = 42;
+
+%% Load model parameters
+p = load_parameters();
+
+%% Load validation experiments
+dataFolder = fullfile(projectRoot, 'system_identification', ...
+    'full_system', 'measurement_data');
+
+prbsFolder = fullfile(dataFolder, 'prbs');
+chirpFolder = fullfile(dataFolder, 'chirp');
+
+experiments = struct( ...
+    'name', {}, ...
+    'signalType', {}, ...
+    'runNumber', {}, ...
+    'amplitude', {}, ...
+    't', {}, ...
+    'u', {}, ...
+    'y', {});
+
+for kRun = validationRuns
+
+    amplitude = amplitudes(kRun);
+    ampText = strrep(sprintf('%.2f', amplitude), '.', 'p');
+
+    signalTypes = {'prbs', 'chirp'};
+    signalFolders = {prbsFolder, chirpFolder};
+
+    for kType = 1:numel(signalTypes)
+
+        signalType = signalTypes{kType};
+        signalFolder = signalFolders{kType};
+
+        filename = fullfile(signalFolder, ...
+            sprintf('fullsystem_%s_A%s_run%02d.mat', ...
+            signalType, ampText, kRun));
+
+        S = load(filename, 'theta_1', 'theta_2', 'u_ts');
+
+        theta1 = double(squeeze(S.theta_1.Data));
+        theta2 = double(squeeze(S.theta_2.Data));
+        u = double(squeeze(S.u_ts.Data));
+        t = double(squeeze(S.theta_1.Time));
+
+        theta1 = theta1(:);
+        theta2 = theta2(:);
+        u = inputSign * u(:);
+        t = t(:);
+
+        experiment.name = sprintf('%s_run_%02d', signalType, kRun);
+        experiment.signalType = signalType;
+        experiment.runNumber = kRun;
+        experiment.amplitude = amplitude;
+        experiment.t = t;
+        experiment.u = u;
+        experiment.y = [theta1, theta2];
+
+        experiments(end + 1) = experiment;
+
+    end
+end
+
+fprintf('Loaded %d validation experiments.\n', numel(experiments));
+
+%% Calculate R_ekf from measured sensor noise
+noiseFile = fullfile(projectRoot, 'system_identification', ...
+    'sensor_noise_measurement', 'noise_data.mat');
+
+noiseData = load(noiseFile, 'theta_1', 'theta_2');
+noiseTheta1 = double(squeeze(noiseData.theta_1.Data));
+noiseTheta2 = double(squeeze(noiseData.theta_2.Data));
+
+noise = [noiseTheta1 - mean(noiseTheta1), ...
+         noiseTheta2 - mean(noiseTheta2)];
+
+R_ekf = cov(noise, 1);
+
+%% Initial covariance
+P0 = diag([ ...
+    R_ekf(1,1), ...
+    R_ekf(2,2), ...
+    sigmaThetaDot0^2, ...
+    sigmaThetaDot0^2]);
+
+%% Q parameterization and EKF functions
+stateTransitionFcn = @(x_k, u_k) rotpendulumEkfStateTransition(x_k, u_k, Ts, p);
+measurementFcn = @rotpendulumEkfMeasurement;
+
+costFcn = @(qLog) ekfValidationCost(qLog, experiments, ...
+    stateTransitionFcn, measurementFcn, R_ekf, P0, ...
+    qLogLower, qLogUpper);
+
+%% Optimize Q in log space with multiple starts
+initialLogQdiag = log10(initialQdiag);
+
+options = optimset( ...
+    'Display', 'iter', ...
+    'MaxIter', 80, ...
+    'MaxFunEvals', 200, ...
+    'TolX', 1e-3, ...
+    'TolFun', 1e-3);
+
+rng(randomSeed);
+
+randomStartLogQdiag = qLogLower + rand(nRandomStarts, 4) .* ...
+    (qLogUpper - qLogLower);
+
+startLogQdiag = [initialLogQdiag; randomStartLogQdiag];
+nStarts = size(startLogQdiag, 1);
+
+startResults = table( ...
+    (1:nStarts).', ...
+    NaN(nStarts, 1), ...
+    NaN(nStarts, 1), ...
+    NaN(nStarts, 1), ...
+    NaN(nStarts, 1), ...
+    NaN(nStarts, 1), ...
+    'VariableNames', {'Start', 'FinalCost', ...
+    'log_q_theta1', 'log_q_theta2', ...
+    'log_q_omega1', 'log_q_omega2'});
+
+bestLogQdiag = [];
+finalValidationCost = inf;
+
+for kStart = 1:nStarts
+
+    fprintf('\nMulti-start EKF Q optimization %d of %d\n', ...
+        kStart, nStarts);
+
+    candidateLogQdiag = fminsearch(costFcn, ...
+        startLogQdiag(kStart, :), options);
+
+    candidateLogQdiag = candidateLogQdiag(:).';
+    candidateLogQdiag = min(max(candidateLogQdiag, qLogLower), qLogUpper);
+
+    candidateCost = costFcn(candidateLogQdiag);
+
+    startResults.FinalCost(kStart) = candidateCost;
+    startResults{kStart, 3:6} = candidateLogQdiag;
+
+    if candidateCost < finalValidationCost
+        finalValidationCost = candidateCost;
+        bestLogQdiag = candidateLogQdiag;
+    end
+
+end
+
+%% Store best result
+bestQdiag = 10 .^ bestLogQdiag(:).';
+
+best_q_theta1 = bestQdiag(1);
+best_q_theta2 = bestQdiag(2);
+best_q_omega1 = bestQdiag(3);
+best_q_omega2 = bestQdiag(4);
+
+Q_ekf = diag(bestQdiag);
+P0_ekf = P0;
+x0_ekf = [pi; 0; 0; 0];
+Ts_ekf = Ts;
+
+ekfResultFile = fullfile(scriptFolder, 'ekf_tuning_result.mat');
+
+fprintf('\nBest EKF process-noise values:\n');
+fprintf('  q_theta1 = %.12g\n', best_q_theta1);
+fprintf('  q_theta2 = %.12g\n', best_q_theta2);
+fprintf('  q_omega1 = %.12g\n', best_q_omega1);
+fprintf('  q_omega2 = %.12g\n', best_q_omega2);
+
+fprintf('\nQ_ekf:\n');
+disp(Q_ekf);
+
+fprintf('R_ekf:\n');
+disp(R_ekf);
+
+fprintf('Final average validation cost: %.12g\n', finalValidationCost);
+
+fprintf('\nMulti-start summary:\n');
+disp(sortrows(startResults, 'FinalCost'));
+
+save(ekfResultFile, ...
+    'Q_ekf', 'R_ekf', 'P0_ekf', 'x0_ekf', 'Ts_ekf', ...
+    'bestQdiag', 'bestLogQdiag', 'finalValidationCost', ...
+    'startResults', ...
+    'best_q_theta1', 'best_q_theta2', ...
+    'best_q_omega1', 'best_q_omega2');
+
+fprintf('Saved EKF tuning result: %s\n', ekfResultFile);
+
+%% Final EKF run and plots
+finalResults = cell(size(experiments));
+
+for kExp = 1:numel(experiments)
+    finalResults{kExp} = runEkfExperiment(experiments(kExp), ...
+        Q_ekf, R_ekf, P0, stateTransitionFcn, measurementFcn);
+end
+
+for kExp = 1:numel(experiments)
+
+    expData = experiments(kExp);
+
+    result = finalResults{kExp};
+    t = expData.t;
+
+    figure('Name', sprintf('EKF output comparison: %s', expData.name));
+    tiledlayout(2, 1);
+
+    nexttile;
+    plot(t, expData.y(:, 1), 'k', ...
+        t, result.yPred(:, 1), 'r--', ...
+        t, result.yEst(:, 1), 'b');
+    grid on;
+    ylabel('\theta_1 [rad]');
+    title(sprintf('%s, A = %.2f', expData.name, expData.amplitude), ...
+        'Interpreter', 'none');
+    legend('measured', 'predicted before correction', ...
+        'estimated after correction');
+
+    nexttile;
+    plot(t, expData.y(:, 2), 'k', ...
+        t, result.yPred(:, 2), 'r--', ...
+        t, result.yEst(:, 2), 'b');
+    grid on;
+    xlabel('Time [s]');
+    ylabel('\theta_2 [rad]');
+    legend('measured', 'predicted before correction', ...
+        'estimated after correction');
+
+    figure('Name', sprintf('EKF estimated rates: %s', expData.name));
+    plot(t, result.xEst(:, 3), 'b', ...
+        t, result.xEst(:, 4), 'r');
+    grid on;
+    xlabel('Time [s]');
+    ylabel('Estimated angular rate [rad/s]');
+    title(sprintf('Estimated rates: %s', expData.name), ...
+        'Interpreter', 'none');
+    legend('\omega_1 estimate', '\omega_2 estimate');
+
+end
+
+%% Local functions
+function cost = ekfValidationCost(qLog, experiments, stateTransitionFcn, ...
+    measurementFcn, R, P0, qLogLower, qLogUpper)
+
+qLog = qLog(:).';
+qLog = min(max(qLog, qLogLower), qLogUpper);
+
+Q_vec = 10 .^ qLog;
+Q = diag(Q_vec);
+
+varTheta1 = R(1,1);
+varTheta2 = R(2,2);
+
+costSum = 0;
+nCostSamples = 0;
+
+for kExp = 1:numel(experiments)
+
+    result = runEkfExperiment(experiments(kExp), Q, R, P0, ...
+        stateTransitionFcn, measurementFcn);
+
+    yMeasured = experiments(kExp).y;
+    yPredicted = result.yPred;
+
+    error = yMeasured(2:end, :) - yPredicted(2:end, :);
+
+    normalizedSquaredError = error(:,1).^2 / varTheta1 + error(:,2).^2 / varTheta2;
+
+    costSum = costSum + sum(normalizedSquaredError);
+    nCostSamples = nCostSamples + numel(normalizedSquaredError);
+
+end
+
+
+cost = costSum / nCostSamples;
+
+
+end
+
+function result = runEkfExperiment(expData, Q, R, P0, stateTransitionFcn, ...
+    measurementFcn)
+
+y = expData.y;
+u = expData.u;
+n = size(y, 1);
+
+x0 = [y(1, 1); y(1, 2); 0; 0];
+
+ekf = extendedKalmanFilter(stateTransitionFcn, measurementFcn, x0);
+ekf.ProcessNoise = Q;
+ekf.MeasurementNoise = R;
+ekf.StateCovariance = P0;
+
+xPred = zeros(n, 4);
+xEst = zeros(n, 4);
+yPred = zeros(n, 2);
+yEst = zeros(n, 2);
+innovation = NaN(n, 2);
+
+xPred(1, :) = x0.';
+xEst(1, :) = x0.';
+yPred(1, :) = measurementFcn(x0).';
+yEst(1, :) = yPred(1, :);
+
+for k = 2:n
+
+    xPredK = predict(ekf, u(k - 1));
+    yPredK = measurementFcn(xPredK);
+
+    yK = y(k, :).';
+    innovationK = yK - yPredK;
+
+    correct(ekf, yK);
+
+    xEstK = ekf.State;
+    yEstK = measurementFcn(xEstK);
+
+    xPred(k, :) = xPredK(:).';
+    xEst(k, :) = xEstK(:).';
+    yPred(k, :) = yPredK(:).';
+    yEst(k, :) = yEstK(:).';
+    innovation(k, :) = innovationK(:).';
+
+end
+
+result = struct();
+result.xPred = xPred;
+result.xEst = xEst;
+result.yPred = yPred;
+result.yEst = yEst;
+result.innovation = innovation;
+
+end
