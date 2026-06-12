@@ -3,22 +3,27 @@ clc;
 
 %% User settings
 sampleTime = 0.01;
-x0 = [pi; pi; 0; 0];
+
+% Equilibrium:
+%   [0;  0; 0; 0] = both rods up
+%   [pi; 0; 0; 0] = both rods down
+%   [pi; pi; 0; 0] = rod 1 down, rod 2 up
+x0 = [pi; 0; 0; 0];
 
 Q_lqr = diag([5 3 0.1 0.01]);
 R_lqr = 1;
 
 %% Kalman filter settings
-Q_kf = diag([1e-7 1e-7 1e-4 1e-4]);
+% These matrices are used by the Simulink Kalman Filter block.
+Q_kf = diag([1e-9 1e-9 1e-7 1e-7]);
 R_kf = diag([1e-5 1e-5]);
 
+% Initial covariance.
 P0_kf = diag([1e-3 1e-3 1e-1 1e-1]);
 
-% Use this if the KF estimates absolute states
-xhat0_kf = x0;
-
-% Use this instead if the KF estimates deviation states
-% xhat0_kf = zeros(4,1);
+% The linearized model is a deviation model, so the KF state also starts
+% from deviation coordinates.
+xhat0_kf = zeros(4,1);
 
 %% Paths
 scriptFolder = fileparts(mfilename('fullpath'));
@@ -65,9 +70,14 @@ u0 = lin.u0;
 y0 = lin.y0;
 f0 = lin.f0;
 
+% Useful constants for Simulink deviation signals
+x0_kf = x0;
+u0_kf = u0;
+y0_kf = y0;
+
 [K_lqr, closedLoopPoles] = calc_lqr(sys_disc, Q_lqr, R_lqr);
 
-%% LQR poles in z-domain and equivalent s-domain
+%% LQR poles
 s_closedLoopPoles = log(closedLoopPoles)/Ts;
 
 fprintf('\nLQR closed-loop poles in z-domain:\n');
@@ -85,10 +95,13 @@ D_kf = Dd;
 % Process noise enters all states directly
 G_kf = eye(size(A_kf,1));
 
-% Steady-state Kalman gain and observer poles
-[L_kf, P_kf, observerPoles] = dlqe(A_kf, G_kf, C_kf, Q_kf, R_kf);
+% Steady-state Kalman gain
+[L_kf, P_kf] = dlqe(A_kf, G_kf, C_kf, Q_kf, R_kf);
 
-%% Observer poles in z-domain and equivalent s-domain
+% Correct observer pole calculation
+observerPoles = eig(A_kf - L_kf*C_kf);
+
+% Equivalent continuous-time poles
 s_observerPoles = log(observerPoles)/Ts;
 
 fprintf('\nKalman observer poles in z-domain:\n');
