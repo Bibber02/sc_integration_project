@@ -1,18 +1,14 @@
 function x_k_1 = rotpendulumEkfStateTransition(x_k, ekfInput)
-%ROTPENDULUMEKFSTATETRANSITION State transition function for Simulink EKF block.
+% State transition function for Simulink EKF block.
 %
-% The Simulink EKF block calls this function as:
+% The EKF block calls:
 %
 %   x_k_1 = rotpendulumEkfStateTransition(x_k, ekfInput)
 %
 % where:
 %
-%   x_k      = current EKF state estimate, supplied internally by EKF block
+%   x_k      = EKF internal state estimate
 %   ekfInput = [u_k; Ts; p(:)]
-%
-% So the EKF extra input port should receive one vector:
-%
-%   [u; Ts; p(:)]
 
     x_k = double(x_k(:));
     ekfInput = double(ekfInput(:));
@@ -35,8 +31,7 @@ function x_k_1 = rotpendulumEkfStateTransition(x_k, ekfInput)
 
     x_k_1 = x_k + (Ts / 6) * (k1 + 2*k2 + 2*k3 + k4);
 
-    % Important for the Simulink EKF block:
-    % output must be exactly 4x1 double
+    % EKF block wants exactly 4x1 double
     x_k_1 = double(x_k_1(:));
 
 end
