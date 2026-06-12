@@ -10,12 +10,12 @@ sampleTime = 0.01;
 %   [pi; pi; 0; 0] = rod 1 down, rod 2 up
 x0 = [pi; 0; 0; 0];
 
-Q_lqr = diag([5 3 0.1 0.01]);
+Q_lqr = diag([10 10 0.1 0.1]);
 R_lqr = 1;
 
 %% Kalman filter settings
 % These matrices are used by the Simulink Kalman Filter block.
-Q_kf = diag([1e-9 1e-9 1e-7 1e-7]);
+Q_kf = diag([1e-6 1e-6 1e-6 1e-4]);
 R_kf = diag([1e-5 1e-5]);
 
 % Initial covariance.
