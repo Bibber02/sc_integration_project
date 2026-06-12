@@ -8,15 +8,15 @@ sampleTime = 0.01;
 %   [0;  0; 0; 0] = both rods up
 %   [pi; 0; 0; 0] = both rods down
 %   [pi; pi; 0; 0] = rod 1 down, rod 2 up
-x0 = [pi; 0; 0; 0];
+x0 = [pi; pi; 0; 0];
 
 Q_lqr = diag([10 10 0.1 0.1]);
 R_lqr = 1;
 
 %% Kalman filter settings
 % These matrices are used by the Simulink Kalman Filter block.
-Q_kf = diag([1e-6 1e-6 1e-6 1e-4]);
-R_kf = diag([1e-5 1e-5]);
+Q_kf = diag([5e-4 3e-4 1e-6 1e-6])*0.08;
+R_kf = diag([1e-4 1e-4]);
 
 % Initial covariance.
 P0_kf = diag([1e-3 1e-3 1e-1 1e-1]);
@@ -154,3 +154,8 @@ fprintf('\nReference tracking gain for theta1:\n');
 fprintf('G_ref = %.6f\n', G_ref);
 fprintf('theta1_0 = %.6f rad\n', theta1_0);
 fprintf('Relative regulator-equation residual: %.3e\n', rel_res_ref);
+
+fs = 1/h;
+fc = 10;
+wn = fc / (fs/2);
+[b, a] = butter(1, wn);
