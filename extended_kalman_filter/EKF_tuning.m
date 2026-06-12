@@ -22,7 +22,7 @@ qLogUpper = [ -2  -2  1  1];
 
 sigmaThetaDot0 = 0.02;
 
-nRandomStarts = 5;
+nRandomStarts = 1;
 randomSeed = 42;
 
 %% Load model parameters
@@ -99,7 +99,8 @@ noiseTheta2 = double(squeeze(noiseData.theta_2.Data));
 noise = [noiseTheta1 - mean(noiseTheta1), ...
          noiseTheta2 - mean(noiseTheta2)];
 
-R_ekf = cov(noise, 1);
+%R_ekf = cov(noise, 1);
+R_ekf = eye(2) * 10^-4;
 
 %% Initial covariance
 P0 = diag([ ...
