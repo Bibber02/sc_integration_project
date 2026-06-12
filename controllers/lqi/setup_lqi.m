@@ -9,7 +9,6 @@ Q_lqr = diag([5 3 0.1 0.01]);
 R_lqr = 1;
 
 %% Kalman filter settings
-% For Simulink Kalman Filter block
 Q_kf = diag([1e-7 1e-7 1e-4 1e-4]);
 R_kf = diag([1e-5 1e-5]);
 
@@ -68,6 +67,15 @@ f0 = lin.f0;
 
 [K_lqr, closedLoopPoles] = calc_lqr(sys_disc, Q_lqr, R_lqr);
 
+%% LQR poles in z-domain and equivalent s-domain
+s_closedLoopPoles = log(closedLoopPoles)/Ts;
+
+fprintf('\nLQR closed-loop poles in z-domain:\n');
+disp(closedLoopPoles);
+
+fprintf('LQR closed-loop poles in equivalent s-domain:\n');
+disp(s_closedLoopPoles);
+
 %% Kalman filter matrices for Simulink
 A_kf = Ad;
 B_kf = Bd;
@@ -78,10 +86,16 @@ D_kf = Dd;
 G_kf = eye(size(A_kf,1));
 
 % Steady-state Kalman gain and observer poles
-[L_kf, P_kf, ~, observerPoles] = dlqe(A_kf, G_kf, C_kf, Q_kf, R_kf);
+[L_kf, P_kf, observerPoles] = dlqe(A_kf, G_kf, C_kf, Q_kf, R_kf);
 
-fprintf('\nKalman observer poles:\n');
+%% Observer poles in z-domain and equivalent s-domain
+s_observerPoles = log(observerPoles)/Ts;
+
+fprintf('\nKalman observer poles in z-domain:\n');
 disp(observerPoles);
+
+fprintf('Kalman observer poles in equivalent s-domain:\n');
+disp(s_observerPoles);
 
 fprintf('Largest observer pole magnitude: %.6f\n', max(abs(observerPoles)));
 
