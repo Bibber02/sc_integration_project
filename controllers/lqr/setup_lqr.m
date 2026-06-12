@@ -17,12 +17,30 @@ R_lqr = 1;
 %% Paths
 scriptFolder = fileparts(mfilename('fullpath'));
 projectRoot = fileparts(fileparts(scriptFolder));
+
 modelFolder = fullfile(projectRoot, 'model');
 hardwareFolder = fullfile(scriptFolder, 'rotating-pendulum');
+ekfFolder = fullfile(projectRoot, 'extended_kalman_filter');
 
 addpath(modelFolder, '-begin');
 addpath(scriptFolder, '-begin');
 addpath(hardwareFolder, '-begin');
+addpath(ekfFolder, '-begin');
+
+%% Check EKF functions
+ekfStateFcnName = 'rotpendulumEkfStateTransition';
+ekfMeasurementFcnName = 'rotpendulumEkfMeasurement';
+
+if exist(ekfStateFcnName, 'file') ~= 2
+    error('Could not find EKF state transition function: %s.m', ekfStateFcnName);
+end
+
+if exist(ekfMeasurementFcnName, 'file') ~= 2
+    error('Could not find EKF measurement function: %s.m', ekfMeasurementFcnName);
+end
+
+ekfStateFcn = str2func(ekfStateFcnName);
+ekfMeasurementFcn = str2func(ekfMeasurementFcnName);
 
 %% Hardware constants
 run(fullfile(hardwareFolder, 'hwinit.m'));
@@ -72,26 +90,35 @@ Ts_ekf = ekfTuning.Ts_ekf;
 
 %% EKF block variables
 
-% The EKF block should use:
+% Use these names in the Simulink EKF block:
 %
-%   State transition function: rotpendulumEkfStateTransitionMuxed
+%   State transition function: rotpendulumEkfStateTransition
 %   Measurement function:      rotpendulumEkfMeasurement
+%
+% EKF settings:
+%
 %   Process noise:             Q_ekf
 %   Measurement noise:         R_ekf
 %   Initial state:             x0
 %   Initial covariance:        P0_ekf
 %   Sample time:               Ts
 %
-% The extra input port should receive:
+% Since rotpendulumEkfStateTransition has inputs:
 %
-%   [u; ekfInputParameters]
+%   x_k, u_k, Ts, p
 %
-% where u is the motor input signal.
+% the EKF block supplies x_k internally.
+% You must provide u_k, Ts, and p as additional inputs/parameters,
+% depending on how your Simulink EKF block is configured.
 
-ekfInputParameters = [Ts; p];
+ekfInputParameters = [Ts; p(:)];
 
 fprintf('\nLQR/EKF setup complete.\n');
 fprintf('Sample time:       %.6g s\n', Ts);
 fprintf('EKF tuning result: %s\n', ekfResultFile);
-fprintf('Use EKF state function: rotpendulumEkfStateTransitionMuxed\n');
-fprintf('Use EKF measurement function: rotpendulumEkfMeasurement\n');
+fprintf('EKF folder:        %s\n', ekfFolder);
+fprintf('State function:    %s\n', which(ekfStateFcnName));
+fprintf('Measurement func:  %s\n', which(ekfMeasurementFcnName));
+fprintf('\nUse in Simulink EKF block:\n');
+fprintf('  State transition function: %s\n', ekfStateFcnName);
+fprintf('  Measurement function:      %s\n', ekfMeasurementFcnName);
