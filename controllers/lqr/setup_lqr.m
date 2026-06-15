@@ -11,8 +11,8 @@ sampleTime = 0.01;
 %   all-up:   [0; 0]
 x0 = [pi; pi; 0; 0];
 
-Q_lqr = diag([5 3 0.1 0.01]);
-R_lqr = 1;
+Q_lqr = diag([1 1 1 1]);
+R_lqr = 10;
 
 %% Paths
 scriptFolder = fileparts(mfilename('fullpath'));
@@ -78,7 +78,7 @@ f0 = lin.f0;
 
 %% Load EKF tuning result
 ekfResultFile = fullfile(projectRoot, ...
-    'kalman_filter_tuning', 'ekf_tuning_result.mat');
+    'extended_kalman_filter', 'ekf_tuning_result.mat');
 
 ekfTuning = load(ekfResultFile, ...
     'Q_ekf', 'R_ekf', 'P0_ekf', 'Ts_ekf');

@@ -9,7 +9,7 @@ sampleTime = 0.01;
 %   all-down: [pi; 0]
 %   down-up:  [pi; pi]
 %   all-up:   [0; 0]
-x0 = [pi; pi; 0; 0];
+x0 = [0; 0; 0; 0];
 
 %% LQR tuning settings
 % State order:
@@ -28,7 +28,7 @@ useBrysonLqr = true;
 
 % Manual fallback weights, used only when useBrysonLqr = false.
 Q_lqr_manual = diag([5 3 0.1 0.01]);
-R_lqr_manual = 1;
+R_lqr_manual = 1000000000;
 
 % Bryson-style allowed deviations. Smaller allowed deviation means larger
 % LQR penalty for that state.
@@ -251,7 +251,7 @@ end
 
 %% Load EKF tuning result
 ekfResultFile = fullfile(projectRoot, ...
-    'kalman_filter_tuning', 'ekf_tuning_result.mat');
+    'extended_kalman_filter', 'ekf_tuning_result.mat');
 
 ekfTuning = load(ekfResultFile, ...
     'Q_ekf', 'R_ekf', 'P0_ekf', 'Ts_ekf');
