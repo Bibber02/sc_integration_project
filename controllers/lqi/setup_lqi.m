@@ -9,7 +9,7 @@ sampleTime = 0.01;
 %   all-down: [pi; 0]
 %   down-up:  [pi; pi]
 %   all-up:   [0; 0]
-x0 = [0; 0; 0; 0];
+x0 = [pi; 0; 0; 0];
 
 %% LQI tuning settings
 % State order:
