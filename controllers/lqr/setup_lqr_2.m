@@ -11,7 +11,7 @@ sampleTime = Ts;
 %   all-down: [pi; 0]
 %   down-up:  [pi; pi]
 %   all-up:   [0; 0]
-x0 = [pi; pi; 0; 0];
+x0 = [0; 0; 0; 0];
 
 %% LQR tuning
 % State order:
@@ -24,8 +24,8 @@ x0 = [pi; pi; 0; 0];
 %   Increase Q(4,4)    -> care more about theta2 velocity / damping
 %
 % Start simple. Tune mostly R_manual first.
-Q_manual = diag([5 3 0.1 0.01]);
-R_manual = 100;
+Q_manual = diag([100 100 100 0.1]);
+R_manual = 1;
 
 % Use this only if the motor command sign is opposite to the model input sign.
 % Usually keep this at +1.
