@@ -9,7 +9,7 @@ sampleTime = 0.01;
 %   all-down: [pi; 0]
 %   down-up:  [pi; pi]
 %   all-up:   [0; 0]
-x0 = [pi; 0; 0; 0];
+x0 = [pi; pi; 0; 0];
 
 %% LQI tuning settings
 % State order:
@@ -33,7 +33,7 @@ D_track = 0;
 % Increase R_lqi if the controller is too aggressive.
 % Increase Qi_lqi if the reference error disappears too slowly.
 Qx_lqi = diag([100 100 100 0.1]);
-Qi_lqi = 5;
+Qi_lqi = 1;
 R_lqi  = 1;
 
 % Sign convention between model input and actual command input.
