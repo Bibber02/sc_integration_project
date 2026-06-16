@@ -27,16 +27,18 @@ D_track = 0;
 % approximately theta1_dev + theta2_dev in the measured-coordinate deviation
 % model. The common theta_scale only multiplies this cost and therefore does
 % not change the structure of the Q block.
-a_lqr = 5;
-b_lqr = 100;
+a_lqr = 10;
+b_lqr = 10;
 
+
+%For pi; 0;, use 10, 10
 Qx_lqi = [a_lqr+b_lqr, b_lqr, 0, 0;
           b_lqr,       b_lqr, 0, 0;
           0,           0,     0, 0;
           0,           0,     0, 0];
 
 % These parameters control the cost of integral error and control effort.
-Qi_lqi = 5;
+Qi_lqi = 10;
 R_lqi  = 1;
 
 %% Paths
