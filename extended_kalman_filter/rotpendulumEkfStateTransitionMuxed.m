@@ -1,10 +1,13 @@
 function x_k_1 = rotpendulumEkfStateTransitionMuxed(x_k, ekfInput)
-%ROTPENDULUMEKFSTATETRANSITIONMUXED Wrapper for Simulink EKF block.
+%ROTPENDULUMEKFSTATETRANSITIONMUXED Compatibility wrapper.
 %
-% ekfInput = [u; Ts; p(:)]
+% ekfInput = [u_model; Ts; p(:)]
+%
+% This wrapper has the same explicit two-input signature as the main EKF
+% transition function. It is safe to use in the EKF block, but the preferred
+% function name is rotpendulumEkfStateTransition.
 
-x_k = double(x_k(:));
-ekfInput = double(ekfInput(:));
+%#codegen
 
 x_k_1 = rotpendulumEkfStateTransition(x_k, ekfInput);
 x_k_1 = double(x_k_1(:));
