@@ -1,5 +1,12 @@
 function lin = linearize_rotpendulum(settings)
-%LINEARIZE_ROTPENDULUM Linearize the reduced nonlinear pendulum model.
+%LINEARIZE_ROTPENDULUM Linearize the selected no-p0 down-line pendulum model.
+%
+% The state is the measured/saved coordinate:
+%   x = [theta1_meas; theta2_meas; theta1_dot_meas; theta2_dot_meas]
+%
+% If no x0 is provided, this function uses the measured-coordinate state
+% corresponding to the physical all-down equilibrium:
+%   theta1_phys = pi, theta2_phys = 0, velocities = 0.
 
 if nargin < 1 || isempty(settings)
     settings = struct();
@@ -11,7 +18,17 @@ end
 scriptFolder = fileparts(mfilename('fullpath'));
 addpath(scriptFolder, '-begin');
 
-x0 = settingOrDefault(settings, 'x0', [pi; pi; 0; 0]);
+if isfield(settings, 'p')
+    p = settings.p(:);
+else
+    p = load_parameters();
+end
+
+x0 = settingOrDefault(settings, 'x0', []);
+if isempty(x0)
+    x0 = measuredAllDownEquilibrium(p);
+end
+
 Ts = settingOrDefault(settings, 'sampleTime', []);
 if isempty(Ts)
     Ts = settingOrDefault(settings, 'Ts', 0.01);
@@ -26,17 +43,9 @@ if isfield(settings, 'linearizedPlantFile') && isempty(settingOrDefault(settings
     outputFile = settings.linearizedPlantFile;
 end
 
-if isfield(settings, 'p')
-    p = settings.p(:);
-else
-    p = load_parameters();
-end
-
-if isfield(settings, 'u0')
-    u0 = settings.u0;
-else
-    u0 = -p(6) / p(5);
-end
+% With the selected no-p0 model, the physical equilibrium input at the
+% all-down/down-line equilibrium is zero.
+u0 = settingOrDefault(settings, 'u0', 0);
 
 x0 = x0(:);
 [f0, y0] = nonlinearPlant(x0, u0, p);
@@ -68,9 +77,9 @@ B(:, 1) = (fPlus - fMinus) / (2 * hu);
 D(:, 1) = (yPlus - yMinus) / (2 * hu);
 
 sys_lin = ss(A, B, C, D);
-sys_lin.StateName = {'theta1', 'theta2', 'theta1_dot', 'theta2_dot'};
+sys_lin.StateName = {'theta1_meas', 'theta2_meas', 'theta1_dot_meas', 'theta2_dot_meas'};
 sys_lin.InputName = {'u'};
-sys_lin.OutputName = {'theta1', 'theta2'};
+sys_lin.OutputName = {'theta1_meas', 'theta2_meas'};
 
 sys_disc = c2d(sys_lin, Ts, 'zoh');
 
@@ -93,6 +102,7 @@ lin.f0 = f0;
 lin.y0 = y0;
 lin.settings = settings;
 lin.outputFile = outputFile;
+lin.theta2_offset = pi - p(13)*p(15) - p(14);
 
 if saveOutput
     outputFolder = fileparts(outputFile);
@@ -115,9 +125,24 @@ if saveOutput
     saveData.x0 = lin.x0;
     saveData.u0 = lin.u0;
     saveData.p = lin.p;
+    saveData.f0 = lin.f0;
+    saveData.y0 = lin.y0;
+    saveData.theta2_offset = lin.theta2_offset;
     saveData.settings = lin.settings;
     save(outputFile, '-struct', 'saveData');
 end
+end
+
+function x_eq = measuredAllDownEquilibrium(p)
+theta_scale        = max(p(13), 1e-6);
+theta1_offset      = p(14);
+theta_abs_down_raw = p(15);
+theta2_offset      = pi - theta_scale*theta_abs_down_raw - theta1_offset;
+
+theta1_meas_eq = (pi - theta1_offset) / theta_scale;
+theta2_meas_eq = (0  - theta2_offset) / theta_scale;
+
+x_eq = [theta1_meas_eq; theta2_meas_eq; 0; 0];
 end
 
 function value = settingOrDefault(settings, fieldName, defaultValue)

@@ -1,0 +1,330 @@
+
+======================================================
+Starting full-system Stribeck identification, no p_0
+Sensor calibration scale/offset corrections are estimated as bounded grey-box parameters
+theta2_offset is computed from theta_scale, theta1_offset, and the measured initial-rest down-line mean
+======================================================
+
+Data folder: C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\..\..\measurement_data
+Model file:  greybox_id_full_stribeck_model_calib_downline_no_p0
+theta_scale_init  = 1
+theta1_offset_init = 0 rad = 0 deg
+theta_abs_down_raw will be computed from the first 4.00 s before input starts.
+
+Output weighting: diag([1, 15])
+Search method: auto
+Identification runs: 1 3 5 7 9 10 
+Validation runs:     2 4 6 8 
+
+Using model file: C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\greybox_id_full_stribeck_model_calib_downline_no_p0.m
+
+Passive-link result file: C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\passive_link\grey_box\passive_link_id_3step_stribeck\passive_link_3step_stribeck_result.mat
+Initial passive-link parameters used in all stages:
+  p_b2      = 0.0670909233
+  p_g2      = 112.024825
+  p_c2      = 0.248612341
+  p_sdelta2 = 0.18408145
+  v_s2      = 3.5
+  eps_v2    = 0.03
+
+Number of identification experiments: 12
+Number of validation experiments:     8
+
+Down-line raw absolute angle from first 4.00 s of training data:
+  theta_abs_down_raw     = 3.14458354361 rad = 180.17137 deg
+  training rest std      = 0.0117773 rad = 0.67479 deg
+  validation rest mean   = 3.15558381292 rad = 180.80163 deg
+  validation rest std    = 0.0394773 rad = 2.26188 deg
+
+
+======================================================
+Stage 1: estimating active parameters with p_c1 fixed
+Free parameters: p_a, p_b1, p_g1, p_u, theta1_offset
+Fixed calibration scales: theta_scale = 1
+Fixed parameters: p_c1 and all passive-link parameters
+======================================================
+
+
+Stage 1 parameter values:
+p_a        =      12.7682   estimated
+p_b1       =      672.088   estimated
+p_c1       =            0   fixed
+p_g1       =      96.1848   estimated
+p_u        =      4006.78   estimated
+p_b2       =    0.0670909   fixed
+p_g2       =      112.025   fixed
+p_c2       =     0.248612   fixed
+p_sdelta2  =     0.184081   fixed
+v_s2       =          3.5   fixed
+eps_v1     =         0.05   fixed
+eps_v2     =         0.03   fixed
+theta_scale =            1   fixed
+theta1_offset =   0.00716345   estimated
+theta_abs_down_raw =      3.14458   fixed
+
+Stage 1 mean identification fit: 20.66 %
+
+======================================================
+Stage 2: estimating final active parameter set
+Free parameters: p_a, p_b1, p_c1, p_g1, p_u, theta1_offset
+Fixed calibration scales: theta_scale = 1
+Fixed parameters: all passive-link parameters and smoothing constants
+======================================================
+
+
+Stage 2 identification fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 2 validation fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 2 mean identification fit: 47.41 %
+Stage 2 mean validation fit:     53.85 %
+Stage 2 theta_scale:  1   fixed
+Stage 2 theta1_offset: 0.0560884584 rad = 3.21363 deg
+Stage 2 theta_abs_down_raw:  3.14458354   fixed
+Stage 2 theta2_offset: -0.0590793484 rad = -3.385 deg   computed from constraint
+
+======================================================
+Stage 2 parameter values and uncertainty
+======================================================
+
+          <strong>Parameter</strong>            <strong>Value</strong>      <strong>Fixed</strong>     <strong>Variance</strong>      <strong>StdDev</strong>      <strong>RelativeStdPercent</strong>
+    <strong>______________________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>__________</strong>    <strong>_________</strong>    <strong>__________________</strong>
+
+    {'p_a'               }      21.125    false      0.085478      0.29237            1.384     
+    {'p_b1'              }      712.19    false      0.025844      0.16076         0.022573     
+    {'p_c1'              }      19.825    false       0.09056      0.30093           1.5179     
+    {'p_g1'              }       98.06    false      0.003235     0.056877         0.058002     
+    {'p_u'               }      4740.3    false        22.296       4.7218          0.09961     
+    {'p_b2'              }    0.067091    true            NaN          NaN              NaN     
+    {'p_g2'              }      112.02    true            NaN          NaN              NaN     
+    {'p_c2'              }     0.24861    true            NaN          NaN              NaN     
+    {'p_sdelta2'         }     0.18408    true            NaN          NaN              NaN     
+    {'v_s2'              }         3.5    true            NaN          NaN              NaN     
+    {'eps_v1'            }        0.05    true            NaN          NaN              NaN     
+    {'eps_v2'            }        0.03    true            NaN          NaN              NaN     
+    {'theta_scale'       }           1    true            NaN          NaN              NaN     
+    {'theta1_offset'     }    0.056088    false    2.4815e-06    0.0015753           2.8085     
+    {'theta_abs_down_raw'}      3.1446    true            NaN          NaN              NaN     
+
+
+Stage 2 free-parameter covariance matrix:
+    0.0855   -0.0069   -0.0026   -0.0136   -0.4512    0.0001
+   -0.0069    0.0258   -0.0007    0.0028    0.1652    0.0000
+   -0.0026   -0.0007    0.0906    0.0020   -0.3807    0.0004
+   -0.0136    0.0028    0.0020    0.0032    0.0285   -0.0000
+   -0.4512    0.1652   -0.3807    0.0285   22.2957   -0.0021
+    0.0001    0.0000    0.0004   -0.0000   -0.0021    0.0000
+
+
+Stage 2 free-parameter correlation matrix:
+                        <strong>p_a</strong>         <strong>p_b1</strong>         <strong>p_c1</strong>         <strong>p_g1</strong>        <strong>p_u</strong>       <strong>theta1_offset</strong>
+                     <strong>_________</strong>    <strong>_________</strong>    <strong>_________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>_____________</strong>
+
+    <strong>p_a          </strong>            1     -0.14737    -0.029786    -0.81556    -0.32682        0.15773  
+    <strong>p_b1         </strong>     -0.14737            1    -0.014444     0.30167     0.21766      0.0073309  
+    <strong>p_c1         </strong>    -0.029786    -0.014444            1     0.11407     -0.2679        0.93483  
+    <strong>p_g1         </strong>     -0.81556      0.30167      0.11407           1     0.10605       -0.10573  
+    <strong>p_u          </strong>     -0.32682      0.21766      -0.2679     0.10605           1       -0.27949  
+    <strong>theta1_offset</strong>      0.15773    0.0073309      0.93483    -0.10573    -0.27949              1  
+
+
+Stage 2 loss function: 4.87877
+
+Saved Stage 2 workspace and technical data before Stage 3:
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage2_active_offsets.mat
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage2_parameters.csv
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage2_correlations.csv
+
+
+======================================================
+Stage 3: estimating sensor calibration scale and offset corrections
+Fixed parameters: active parameters, passive parameters, smoothing constants
+Free parameters: theta_scale, theta1_offset
+======================================================
+
+Stage 3 calibration start 1: theta_scale = 0.99, theta1_offset = 0.0260885 rad
+  completed: theta_scale = 1.02191118, theta1_offset = -0.0223388118, loss = 4.36892717
+Stage 3 calibration start 2: theta_scale = 0.99, theta1_offset = 0.0560885 rad
+  completed: theta_scale = 0.99668333, theta1_offset = 0.0530799559, loss = 4.91155747
+Stage 3 calibration start 3: theta_scale = 0.99, theta1_offset = 0.0860885 rad
+  completed: theta_scale = 0.99, theta1_offset = 0.0860884584, loss = 4.97208587
+Stage 3 calibration start 4: theta_scale = 1, theta1_offset = 0.0260885 rad
+  completed: theta_scale = 1.02166135, theta1_offset = -0.0220812201, loss = 4.36929953
+Stage 3 calibration start 5: theta_scale = 1, theta1_offset = 0.0560885 rad
+  completed: theta_scale = 1.01142288, theta1_offset = 0.0407969856, loss = 4.70194757
+Stage 3 calibration start 6: theta_scale = 1, theta1_offset = 0.0860885 rad
+  completed: theta_scale = 1.00000428, theta1_offset = 0.086223217, loss = 7.73573659
+Stage 3 calibration start 7: theta_scale = 1.01, theta1_offset = 0.0260885 rad
+  completed: theta_scale = 1.01, theta1_offset = 0.0260261615, loss = 7.90782509
+Stage 3 calibration start 8: theta_scale = 1.01, theta1_offset = 0.0560885 rad
+  completed: theta_scale = 1.01, theta1_offset = 0.0560884584, loss = 4.7136109
+Stage 3 calibration start 9: theta_scale = 1.01, theta1_offset = 0.0860885 rad
+  completed: theta_scale = 1.01109662, theta1_offset = 0.0850930507, loss = 36.9942113
+
+Stage 3 calibration multistart results:
+    <strong>Start</strong>    <strong>InitialThetaScale</strong>    <strong>InitialTheta1Offset</strong>    <strong>FinalThetaScale</strong>    <strong>FinalTheta1Offset</strong>    <strong>LossFcn</strong>
+    <strong>_____</strong>    <strong>_________________</strong>    <strong>___________________</strong>    <strong>_______________</strong>    <strong>_________________</strong>    <strong>_______</strong>
+
+      1            0.99                0.026088               1.0219            -0.022339        4.3689 
+      2            0.99                0.056088              0.99668              0.05308        4.9116 
+      3            0.99                0.086088                 0.99             0.086088        4.9721 
+      4               1                0.026088               1.0217            -0.022081        4.3693 
+      5               1                0.056088               1.0114             0.040797        4.7019 
+      6               1                0.086088                    1             0.086223        7.7357 
+      7            1.01                0.026088                 1.01             0.026026        7.9078 
+      8            1.01                0.056088                 1.01             0.056088        4.7136 
+      9            1.01                0.086088               1.0111             0.085093        36.994 
+
+
+Stage 3 identification fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 3 validation fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 3 mean identification fit: 48.99 %
+Stage 3 mean validation fit:     53.84 %
+Stage 3 theta_scale:  1.02191118
+Stage 3 theta1_offset: -0.0223388118 rad = -1.27992 deg
+Stage 3 theta_abs_down_raw:  3.14458354
+Stage 3 theta2_offset: -0.049553619 rad = -2.83921 deg   computed from constraint
+Equivalent hardware calibration after Stage 3:
+  a_theta_1 = 1.2266756920805
+  b_theta_1 = 1.08874641342335
+  a_theta_2 = 1.24951734932504
+  b_theta_2 = 1.22975820649329
+
+======================================================
+Stage 3 parameter values and uncertainty
+======================================================
+
+          <strong>Parameter</strong>             <strong>Value</strong>      <strong>Fixed</strong>     <strong>Variance</strong>       <strong>StdDev</strong>      <strong>RelativeStdPercent</strong>
+    <strong>______________________</strong>    <strong>_________</strong>    <strong>_____</strong>    <strong>__________</strong>    <strong>__________</strong>    <strong>__________________</strong>
+
+    {'p_a'               }       21.125    true            NaN           NaN              NaN     
+    {'p_b1'              }       712.19    true            NaN           NaN              NaN     
+    {'p_c1'              }       19.825    true            NaN           NaN              NaN     
+    {'p_g1'              }        98.06    true            NaN           NaN              NaN     
+    {'p_u'               }       4740.3    true            NaN           NaN              NaN     
+    {'p_b2'              }     0.067091    true            NaN           NaN              NaN     
+    {'p_g2'              }       112.02    true            NaN           NaN              NaN     
+    {'p_c2'              }      0.24861    true            NaN           NaN              NaN     
+    {'p_sdelta2'         }      0.18408    true            NaN           NaN              NaN     
+    {'v_s2'              }          3.5    true            NaN           NaN              NaN     
+    {'eps_v1'            }         0.05    true            NaN           NaN              NaN     
+    {'eps_v2'            }         0.03    true            NaN           NaN              NaN     
+    {'theta_scale'       }       1.0219    false    3.4763e-07     0.0005896         0.057696     
+    {'theta1_offset'     }    -0.022339    false    4.3967e-07    0.00066307           2.9683     
+    {'theta_abs_down_raw'}       3.1446    true            NaN           NaN              NaN     
+
+
+Stage 3 free-parameter covariance matrix:
+   1.0e-06 *
+
+    0.3476   -0.2292
+   -0.2292    0.4397
+
+
+Stage 3 free-parameter correlation matrix:
+                     <strong>theta_scale</strong>    <strong>theta1_offset</strong>
+                     <strong>___________</strong>    <strong>_____________</strong>
+
+    <strong>theta_scale  </strong>            1         -0.5862   
+    <strong>theta1_offset</strong>      -0.5862               1   
+
+
+Stage 3 loss function: 4.36893
+
+Saved Stage 3 workspace and technical data:
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage3_sensor_calibration.mat
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage3_parameters.csv
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage3_correlations.csv
+
+======================================================
+Stage 4: short final joint refinement, diagnostic only
+Free parameters: active parameters and down-line constrained calibration corrections
+Fixed parameters: passive parameters and smoothing constants
+======================================================
+
+
+Stage 4 identification fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 4 validation fit, per experiment and output:
+    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}    {2×1 double}
+
+
+Stage 4 mean identification fit: 75.58 %
+Stage 4 mean validation fit:     65.33 %
+Stage 4 theta_scale:  1.02998718
+Stage 4 theta1_offset: -0.0611201346 rad = -3.50193 deg
+Stage 4 theta_abs_down_raw:  3.14458354
+Stage 4 theta2_offset: -0.036167958 rad = -2.07227 deg   computed from constraint
+Equivalent hardware calibration after Stage 4:
+  a_theta_1 = 1.23636991507413
+  b_theta_1 = 1.11997071144102
+  a_theta_2 = 1.2593920863048
+  b_theta_2 = 1.21881858291916
+
+======================================================
+Stage 4 parameter values and uncertainty
+======================================================
+
+          <strong>Parameter</strong>            <strong>Value</strong>      <strong>Fixed</strong>     <strong>Variance</strong>       <strong>StdDev</strong>      <strong>RelativeStdPercent</strong>
+    <strong>______________________</strong>    <strong>________</strong>    <strong>_____</strong>    <strong>__________</strong>    <strong>__________</strong>    <strong>__________________</strong>
+
+    {'p_a'               }      44.259    false        1.6532        1.2858           2.9052     
+    {'p_b1'              }      2032.3    false        194.51        13.947          0.68626     
+    {'p_c1'              }      243.63    false        18.105         4.255           1.7465     
+    {'p_g1'              }      219.07    false        1.7506        1.3231          0.60396     
+    {'p_u'               }       13827    false        8036.6        89.647          0.64834     
+    {'p_b2'              }    0.067091    true            NaN           NaN              NaN     
+    {'p_g2'              }      112.02    true            NaN           NaN              NaN     
+    {'p_c2'              }     0.24861    true            NaN           NaN              NaN     
+    {'p_sdelta2'         }     0.18408    true            NaN           NaN              NaN     
+    {'v_s2'              }         3.5    true            NaN           NaN              NaN     
+    {'eps_v1'            }        0.05    true            NaN           NaN              NaN     
+    {'eps_v2'            }        0.03    true            NaN           NaN              NaN     
+    {'theta_scale'       }        1.03    false    3.3444e-07    0.00057831         0.056147     
+    {'theta1_offset'     }    -0.06112    false    1.9427e-06     0.0013938           2.2804     
+    {'theta_abs_down_raw'}      3.1446    true            NaN           NaN              NaN     
+
+
+Stage 4 free-parameter covariance matrix:
+   1.0e+03 *
+
+    0.0017    0.0092    0.0027    0.0011    0.0716   -0.0000   -0.0000
+    0.0092    0.1945    0.0163    0.0171    1.2308   -0.0000    0.0000
+    0.0027    0.0163    0.0181    0.0026    0.1545   -0.0000    0.0000
+    0.0011    0.0171    0.0026    0.0018    0.1126   -0.0000    0.0000
+    0.0716    1.2308    0.1545    0.1126    8.0366   -0.0000    0.0000
+   -0.0000   -0.0000   -0.0000   -0.0000   -0.0000    0.0000   -0.0000
+   -0.0000    0.0000    0.0000    0.0000    0.0000   -0.0000    0.0000
+
+
+Stage 4 free-parameter correlation matrix:
+                        <strong>p_a</strong>         <strong>p_b1</strong>        <strong>p_c1</strong>         <strong>p_g1</strong>        <strong>p_u</strong>       <strong>theta_scale</strong>    <strong>theta1_offset</strong>
+                     <strong>_________</strong>    <strong>________</strong>    <strong>_________</strong>    <strong>________</strong>    <strong>________</strong>    <strong>___________</strong>    <strong>_____________</strong>
+
+    <strong>p_a          </strong>            1     0.51432      0.49484     0.67326     0.62085     -0.043559       -0.092107  
+    <strong>p_b1         </strong>      0.51432           1      0.27502     0.92643     0.98444      -0.47731         0.18973  
+    <strong>p_c1         </strong>      0.49484     0.27502            1     0.45963     0.40508     -0.082269         0.27208  
+    <strong>p_g1         </strong>      0.67326     0.92643      0.45963           1     0.94893      -0.50039        0.046225  
+    <strong>p_u          </strong>      0.62085     0.98444      0.40508     0.94893           1      -0.44764         0.18007  
+    <strong>theta_scale  </strong>    -0.043559    -0.47731    -0.082269    -0.50039    -0.44764             1        -0.30804  
+    <strong>theta1_offset</strong>    -0.092107     0.18973      0.27208    0.046225     0.18007      -0.30804               1  
+
+
+Stage 4 loss function: 1.92367
+
+Saved Stage 4 workspace and technical data:
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage4_final_refinement.mat
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage4_parameters.csv
+  C:\School\Integration Project Systems and Control\sc_integration_project\system_identification\full_system\grey_box\stribeck\full_system_id_stribeck_calib_downline_no_p0_60_40_theta2w15_auto_stage4_correlations.csv

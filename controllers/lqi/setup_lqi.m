@@ -1,28 +1,27 @@
-%% Simple LQI + EKF setup
+%% Simple LQI + EKF setup for selected no-p0 down-line model
 clear;
 clc;
 
 %% User settings
 sampleTime = 0.01;
-x0 = [pi; 0; 0; 0];
+
+% Sign convention between model input and actual command input.
+%   u_model_dev = inputSignCommandToModel * u_command_dev
+% Use -1 if your physical command sign is opposite to the identified model.
+inputSignCommandToModel = -1;
 
 % Determines what output we want the integral action to track.
-% Current choice: theta1 only.
+% Current choice: theta1 only, in measured/saved coordinates.
 C_track = [1 0 0 0];
 D_track = 0;
 
-% a_lqr penalizes theta1 deviation.
-% b_lqr penalizes the passive rod not being vertical.
+% a_lqr penalizes active angle deviation.
+% b_lqr penalizes passive absolute angle deviation.
 %
-% Since theta2 is relative, the absolute passive-rod angle deviation is
-% theta1 + theta2. Therefore:
-%
-%   a_lqr*theta1^2 + b_lqr*(theta1 + theta2)^2
-%
-% gives the angle-cost block:
-%
-%   [a_lqr+b_lqr, b_lqr;
-%    b_lqr,       b_lqr]
+% Since theta2 is relative, the passive absolute angle deviation is
+% approximately theta1_dev + theta2_dev in the measured-coordinate deviation
+% model. The common theta_scale only multiplies this cost and therefore does
+% not change the structure of the Q block.
 a_lqr = 5;
 b_lqr = 100;
 
@@ -34,11 +33,6 @@ Qx_lqi = [a_lqr+b_lqr, b_lqr, 0, 0;
 % These parameters control the cost of integral error and control effort.
 Qi_lqi = 5;
 R_lqi  = 1;
-
-% Sign convention between model input and actual command input.
-%   u_model_dev = inputSignCommandToModel * u_command_dev
-% Use -1 if your physical command sign is opposite to the identified model.
-inputSignCommandToModel = -1;
 
 %% Paths
 scriptFolder = fileparts(mfilename('fullpath'));
@@ -64,10 +58,17 @@ ekfMeasurementFcn = str2func(ekfMeasurementFcnName);
 run(fullfile(hardwareFolder, 'hwinit.m'));
 
 %% Plant model
-p = load_parameters();
+[p, parameterInfo] = load_parameters();
+
+% Use the measured-coordinate state corresponding to:
+%   theta1_phys = pi, theta2_phys = 0, velocities = 0.
+% This is not necessarily exactly [pi; 0; 0; 0] in measured coordinates
+% once the down-line calibration correction is included.
+x0 = measuredAllDownEquilibriumFromParameters(p);
 
 lin = linearize_rotpendulum(struct( ...
     'x0', x0, ...
+    'u0', 0, ...
     'sampleTime', sampleTime, ...
     'p', p, ...
     'saveOutput', false));
@@ -101,7 +102,6 @@ u0_model = u0;
 u0_command = inputSignCommandToModel * u0_model;
 
 % Initial/reference offset for the tracked output.
-% For the current C_track, this is theta1_0.
 theta1_0 = C_track*x_eq_lqi + D_track*u0_model;
 y_track_0 = theta1_0;
 
@@ -130,18 +130,12 @@ closedLoopPoles_lqi = eig(Acl_aug_lqi);
 s_closedLoopPoles_lqi = log(closedLoopPoles_lqi)/Ts;
 
 %% Closed-loop damping diagnostics
-% The dominant discrete poles are the poles with largest |z|.
-% Only complex conjugate pole pairs have a standard second-order damping
-% ratio. Real poles are non-oscillatory modes.
 z_poles_lqi = closedLoopPoles_lqi;
 s_poles_lqi = s_closedLoopPoles_lqi;
 
 zeta_lqi = nan(size(s_poles_lqi));
 omega_n_lqi = nan(size(s_poles_lqi));
 
-% Use the z-pole imaginary part to decide whether a mode is complex.
-% This avoids treating negative real z-poles as ordinary oscillatory modes
-% just because log(z) has an imaginary part on the principal branch.
 zPoleImagTol_lqi = 1e-8;
 isComplexMode_lqi = abs(imag(z_poles_lqi)) > zPoleImagTol_lqi;
 isNegativeRealZ_lqi = ~isComplexMode_lqi & real(z_poles_lqi) < 0;
@@ -209,17 +203,32 @@ R_ekf = ekfTuning.R_ekf;
 P0_ekf = ekfTuning.P0_ekf;
 Ts_ekf = ekfTuning.Ts_ekf;
 
-% Additional parameters/input vector for the EKF block, if you use a single
-% vector input for Ts and p.
+% Additional parameters/input vector for the EKF block when using one muxed
+% input. Feed the EKF transition function [u; Ts; p(:)].
 ekfInputParameters = [Ts; p(:)];
 
 %% Compact diagnostics
+thetaScale = p(13);
+theta1Offset = p(14);
+thetaAbsDownRaw = p(15);
+theta2Offset = pi - thetaScale*thetaAbsDownRaw - theta1Offset;
+
+theta1PhysEq = thetaScale*x_eq_lqi(1) + theta1Offset;
+theta2PhysEq = thetaScale*x_eq_lqi(2) + theta2Offset;
+
 fprintf('\nLQI/EKF setup complete.\n');
+fprintf('Selected parameter file:\n  %s\n', parameterInfo.matFile);
 fprintf('Ts: %.6g s\n', Ts);
 fprintf('Reference output: theta1 only\n');
+fprintf('Measured-coordinate equilibrium x_eq_lqi:\n');
+disp(x_eq_lqi);
+fprintf('Physical equilibrium check: theta1_phys = %.9g rad, theta2_phys = %.9g rad, sum = %.9g rad\n', ...
+    theta1PhysEq, theta2PhysEq, theta1PhysEq + theta2PhysEq);
 fprintf('theta1_0: %.6f rad\n', theta1_0);
 fprintf('u0_model: %.6f\n', u0_model);
 fprintf('u0_command: %.6f\n', u0_command);
+fprintf('f0 at linearization point:\n');
+disp(f0);
 fprintf('a_lqr: %.6g\n', a_lqr);
 fprintf('b_lqr: %.6g\n', b_lqr);
 fprintf('Qx_lqi:\n');
@@ -276,3 +285,16 @@ fprintf('  e = r_dev - C_track*x_dev\n');
 fprintf('  xi(k+1) = xi(k) + Ts*e(k)\n');
 fprintf('  u_command_dev = Kx_lqi_command*x_dev + Ki_lqi_command*xi + G_ref_command*r_dev\n');
 fprintf('  u_command = u0_command + u_command_dev\n');
+
+%% Local helper
+function x_eq = measuredAllDownEquilibriumFromParameters(p)
+theta_scale        = max(p(13), 1e-6);
+theta1_offset      = p(14);
+theta_abs_down_raw = p(15);
+theta2_offset      = pi - theta_scale*theta_abs_down_raw - theta1_offset;
+
+theta1_meas_eq = (pi - theta1_offset) / theta_scale;
+theta2_meas_eq = (0  - theta2_offset) / theta_scale;
+
+x_eq = [theta1_meas_eq; theta2_meas_eq; 0; 0];
+end

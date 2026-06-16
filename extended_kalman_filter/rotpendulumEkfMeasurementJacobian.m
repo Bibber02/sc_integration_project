@@ -1,13 +1,13 @@
 function H = rotpendulumEkfMeasurementJacobian(x)
-
-% Measurement Jacobian for:
+%ROTPENDULUMEKFMEASUREMENTJACOBIAN Measurement Jacobian.
 %
-%   y = [theta1; theta2]
+% Measurement:
+%   y = [theta1_meas; theta2_meas]
 %
 % State:
-%   x = [theta1; theta2; dtheta1; dtheta2]
+%   x = [theta1_meas; theta2_meas; theta1_dot_meas; theta2_dot_meas]
 
-x = x(:);
+x = x(:); %#ok<NASGU>
 
 H = [1 0 0 0;
      0 1 0 0];
