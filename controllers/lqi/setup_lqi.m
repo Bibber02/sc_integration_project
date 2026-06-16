@@ -5,6 +5,11 @@ clc;
 %% User settings
 sampleTime = 0.01;
 
+% Keep the same measured-coordinate linearization point as the earlier LQI scripts.
+% The identified model still applies the calibration correction internally, but
+% the controller/Simulink deviation variables remain centred on [pi; 0; 0; 0].
+x0 = [pi; 0; 0; 0];
+
 % Sign convention between model input and actual command input.
 %   u_model_dev = inputSignCommandToModel * u_command_dev
 % Use -1 if your physical command sign is opposite to the identified model.
@@ -60,12 +65,9 @@ run(fullfile(hardwareFolder, 'hwinit.m'));
 %% Plant model
 [p, parameterInfo] = load_parameters();
 
-% Use the measured-coordinate state corresponding to:
-%   theta1_phys = pi, theta2_phys = 0, velocities = 0.
-% This is not necessarily exactly [pi; 0; 0; 0] in measured coordinates
-% once the down-line calibration correction is included.
-x0 = measuredAllDownEquilibriumFromParameters(p);
-
+% Keep old-style operating point. Do not shift x0 using the calibration
+% offsets here; nonlinearPlant applies the calibration transform internally
+% when evaluating the dynamics and the linearization derivatives.
 lin = linearize_rotpendulum(struct( ...
     'x0', x0, ...
     'u0', 0, ...
@@ -220,9 +222,9 @@ fprintf('\nLQI/EKF setup complete.\n');
 fprintf('Selected parameter file:\n  %s\n', parameterInfo.matFile);
 fprintf('Ts: %.6g s\n', Ts);
 fprintf('Reference output: theta1 only\n');
-fprintf('Measured-coordinate equilibrium x_eq_lqi:\n');
+fprintf('Measured-coordinate linearization point x_eq_lqi:\n');
 disp(x_eq_lqi);
-fprintf('Physical equilibrium check: theta1_phys = %.9g rad, theta2_phys = %.9g rad, sum = %.9g rad\n', ...
+fprintf('Physical angle at linearization point: theta1_phys = %.9g rad, theta2_phys = %.9g rad, sum = %.9g rad\n', ...
     theta1PhysEq, theta2PhysEq, theta1PhysEq + theta2PhysEq);
 fprintf('theta1_0: %.6f rad\n', theta1_0);
 fprintf('u0_model: %.6f\n', u0_model);
@@ -285,16 +287,3 @@ fprintf('  e = r_dev - C_track*x_dev\n');
 fprintf('  xi(k+1) = xi(k) + Ts*e(k)\n');
 fprintf('  u_command_dev = Kx_lqi_command*x_dev + Ki_lqi_command*xi + G_ref_command*r_dev\n');
 fprintf('  u_command = u0_command + u_command_dev\n');
-
-%% Local helper
-function x_eq = measuredAllDownEquilibriumFromParameters(p)
-theta_scale        = max(p(13), 1e-6);
-theta1_offset      = p(14);
-theta_abs_down_raw = p(15);
-theta2_offset      = pi - theta_scale*theta_abs_down_raw - theta1_offset;
-
-theta1_meas_eq = (pi - theta1_offset) / theta_scale;
-theta2_meas_eq = (0  - theta2_offset) / theta_scale;
-
-x_eq = [theta1_meas_eq; theta2_meas_eq; 0; 0];
-end
