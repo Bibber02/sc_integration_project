@@ -8,7 +8,7 @@ sampleTime = 0.01;
 % Keep the same measured-coordinate linearization point as the earlier LQI scripts.
 % The identified model still applies the calibration correction internally, but
 % the controller/Simulink deviation variables remain centred on [pi; 0; 0; 0].
-x0 = [pi; 0; 0; 0];
+x0 = [pi; pi; 0; 0];
 
 % Sign convention between model input and actual command input.
 %   u_model_dev = inputSignCommandToModel * u_command_dev
