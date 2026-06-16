@@ -4,7 +4,7 @@ clc;
 
 %% User settings
 sampleTime = 0.01;
-x0 = [pi; 0; 0; 0];
+x0 = [pi; pi; 0; 0];
 
 % Determines what output we want the integral action to track.
 % Current choice: theta1 only.
@@ -23,8 +23,8 @@ D_track = 0;
 %
 %   [a_lqr+b_lqr, b_lqr;
 %    b_lqr,       b_lqr]
-a_lqr = 5;
-b_lqr = 100;
+a_lqr = 1;
+b_lqr = 2;
 
 Qx_lqi = [a_lqr+b_lqr, b_lqr, 0, 0;
           b_lqr,       b_lqr, 0, 0;
@@ -32,8 +32,8 @@ Qx_lqi = [a_lqr+b_lqr, b_lqr, 0, 0;
           0,           0,     0, 0];
 
 % These parameters control the cost of integral error and control effort.
-Qi_lqi = 5;
-R_lqi  = 1;
+Qi_lqi = 1000;
+R_lqi  = 100;
 
 % Sign convention between model input and actual command input.
 %   u_model_dev = inputSignCommandToModel * u_command_dev
